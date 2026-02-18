@@ -132,3 +132,10 @@ For AI analysis and Jira integration:
 - `APP_KEY` - Cisco Chat-AI application key
 - `CLIENT_ID`, `CLIENT_SECRET` - Cisco OAuth credentials
 - `EMAIL`, `API_TOKEN` - Jira API credentials (cisco-learning.atlassian.net)
+
+## Active Technologies
+- YAML (GitHub Actions), Bash (scripting) + GitHub Actions, git commands (001-tutorial-testing-sync)
+- Git repositories (file-based) (001-tutorial-testing-sync)
+
+## Recent Changes
+- 001-tutorial-testing-sync: Added YAML (GitHub Actions), Bash (scripting) + GitHub Actions, git commands

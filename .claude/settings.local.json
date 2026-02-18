@@ -14,7 +14,19 @@
       "Bash(specify init:*)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
-      "WebFetch(domain:api.github.com)"
+      "WebFetch(domain:api.github.com)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\ndocs: ratify constitution v1.0.0 for Cisco U. tutorial governance\n\nDefines 5 core principles: Tutorial Quality First, Structured Content\nOrganization, Validate Early/Fail Fast, Editorial Consistency Through\nAutomation, and Transparent Pipeline Feedback. Includes content standards,\nworkflow standards, and governance procedures.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git commit:*)",
+      "Bash(git fetch:*)",
+      "Bash(ls:*)",
+      "Bash(.specify/scripts/bash/create-new-feature.sh:*)",
+      "Bash(.specify/scripts/bash/setup-plan.sh:*)",
+      "Bash(.specify/scripts/bash/update-agent-context.sh:*)",
+      "Bash(.specify/scripts/bash/check-prerequisites.sh:*)",
+      "Bash(git push:*)",
+      "Bash(git rm:*)",
+      "Bash(git ls-tree:*)"
     ]
   }
 }
