@@ -1,22 +1,16 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version change: 0.0.0 → 1.0.0 (MAJOR: initial constitution ratification)
+Version change: 1.0.0 → 1.1.0 (MINOR: added external dependencies section)
 
-Modified principles: N/A (initial creation)
+Modified principles: None
 
 Added sections:
-- Core Principles (5 principles)
-- Content Standards section
-- Workflow Standards section
-- Governance section
+- External Dependencies section (sidecar.json schema ownership)
 
-Removed sections: N/A
+Removed sections: None
 
-Templates requiring updates:
-- .specify/templates/plan-template.md: ✅ No changes needed (Constitution Check section is generic)
-- .specify/templates/spec-template.md: ✅ No changes needed (requirements structure aligns)
-- .specify/templates/tasks-template.md: ✅ No changes needed (task categorization aligns)
+Templates requiring updates: None
 
 Follow-up TODOs: None
 ==================
@@ -135,6 +129,24 @@ The following patterns cause XML conversion failures and MUST be avoided:
 | L&C UAT Team | Staging approval before production |
 | Publishing Team | Platform publication via REST API |
 
+## External Dependencies
+
+### sidecar.json Schema Ownership
+
+The `sidecar.json` schema is defined and owned by the L&C UAT team. Schema changes:
+
+- MUST be requested through the UAT team
+- Require a change process that takes time to implement
+- Cannot be unilaterally modified by the tutorial content team
+
+**Implications:**
+- Skill levels are fixed: Beginner, Intermediate, Advanced, Expert (no intermediate values)
+- Technologies list is fixed per the schema
+- `tags` field is currently free-form (no enforced vocabulary)
+- New fields require UAT team approval and schema update
+
+**Rationale:** The schema defines the contract between the tutorial content system and the Cisco U. platform. Maintaining schema stability ensures reliable content publishing.
+
 ## Governance
 
 This constitution supersedes all other practices for the Cisco U. tutorial content ecosystem. All changes MUST be documented and approved through the standard PR process.
@@ -156,4 +168,4 @@ This constitution supersedes all other practices for the Cisco U. tutorial conte
 - Complexity beyond these standards MUST be justified
 - Validation tools MUST be updated to enforce new requirements
 
-**Version**: 1.0.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-18
+**Version**: 1.1.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-18
