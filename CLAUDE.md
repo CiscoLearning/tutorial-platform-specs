@@ -133,9 +133,27 @@ For AI analysis and Jira integration:
 - `CLIENT_ID`, `CLIENT_SECRET` - Cisco OAuth credentials
 - `EMAIL`, `API_TOKEN` - Jira API credentials (cisco-learning.atlassian.net)
 
-## Active Technologies
-- YAML (GitHub Actions), Bash (scripting) + GitHub Actions, git commands (001-tutorial-testing-sync)
-- Git repositories (file-based) (001-tutorial-testing-sync)
+## Maintenance Requirements
 
-## Recent Changes
-- 001-tutorial-testing-sync: Added YAML (GitHub Actions), Bash (scripting) + GitHub Actions, git commands
+**Keep these files up to date as the project evolves:**
+
+1. **README.md** (top-level)
+   - Update feature backlog table when features move between states
+   - Update "Completed" section when features are done
+   - Keep repository structure diagram current
+
+2. **requirements.md** (.specify/specs/)
+   - Add new features to backlog (FF-X)
+   - Update feature priorities as they change
+   - Mark completed features
+
+3. **CLAUDE.md** (this file)
+   - Update common commands when new tools are added
+   - Keep architecture section current
+   - Document new environment variables
+
+## Completed Features
+
+| Feature | Spec Location | Date |
+|---------|---------------|------|
+| FR-0: Tutorial-Testing Sync | specs/001-tutorial-testing-sync/ | 2026-02-18 |

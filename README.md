@@ -1,0 +1,82 @@
+# Cisco U. Tutorial Platform - Development Workspace
+
+This repository serves as the planning and specification workspace for improving the Cisco U. tutorial content pipeline. It uses [Spec-Kit](https://github.com/github/spec-kit) for spec-driven development.
+
+## Repository Structure
+
+```
+agent-ciscou-work/
+├── .specify/                    # Spec-Kit templates and project memory
+│   ├── memory/constitution.md   # Project principles and governance
+│   └── specs/                   # Requirements, architecture docs
+├── specs/                       # Feature specifications
+│   └── 001-tutorial-testing-sync/  # Completed: Production sync
+├── CLAUDE.md                    # Claude Code instructions
+├── tutorial-testing/            # Cloned repo (tools development)
+└── ciscou-tutorial-content/     # Cloned repo (production reference)
+```
+
+## Setup
+
+To replicate this workspace:
+
+```bash
+# Clone this specs repo
+git clone <this-repo-url> agent-ciscou-work
+cd agent-ciscou-work
+
+# Clone the sub-repositories
+git clone git@github.com:CiscoLearning/tutorial-testing.git
+git clone git@github.com:CiscoLearning/ciscou-tutorial-content.git
+```
+
+**Note:** `ciscou-tutorial-content` is a private org repository. You need CiscoLearning org membership to access it.
+
+## Feature Backlog
+
+See [.specify/specs/requirements.md](.specify/specs/requirements.md) for the full backlog.
+
+### Completed
+
+| Feature | Description | Status |
+|---------|-------------|--------|
+| FR-0: Tutorial-Testing Sync | Daily sync of production tutorials to testing repo | Done |
+
+### In Progress
+
+None currently.
+
+### Backlog
+
+| Feature | Description | Priority |
+|---------|-------------|----------|
+| FR-1 | Enhanced Markdown Validation | High |
+| FR-2 | Editorial Style Validation | High |
+| FR-3 | AI-Powered Editorial Feedback | High |
+| FR-4 | Pre-commit Validation | Medium |
+| FR-5 | PR Comment Enhancements | Medium |
+| FF-1 | AI-Powered Sidecar Generation | Future |
+| FF-2 | Power User Local Workflow CLI | Future |
+| FF-3 | Tutorial Preview Rendering | Future |
+| FF-4 | Automated GUID Cache Updates | Future |
+
+## Workflow
+
+1. **Plan**: Use `/speckit.specify` to create feature specs
+2. **Design**: Use `/speckit.plan` to create implementation plans
+3. **Tasks**: Use `/speckit.tasks` to generate task lists
+4. **Implement**: Use `/speckit.implement` to execute tasks
+5. **Analyze**: Use `/speckit.analyze` to check consistency
+
+## Related Repositories
+
+| Repository | Purpose |
+|------------|---------|
+| [tutorial-testing](https://github.com/CiscoLearning/tutorial-testing) | Tools development, validation scripts, CI/CD testing |
+| [ciscou-tutorial-content](https://github.com/CiscoLearning/ciscou-tutorial-content) | Production tutorials (private, 146+ tutorials) |
+
+## Maintenance
+
+- Keep this README updated as features are completed
+- Update the backlog table when starting/completing features
+- Sub-repositories are independent - changes go directly to them
