@@ -222,3 +222,22 @@ The following features have been identified but are not in the current scope. Th
 - Could be browser-based or VS Code extension
 
 **Status:** Low priority, requires understanding of Cisco U. rendering engine
+
+### FF-4: Automated GUID Cache Updates
+
+**Problem:** The `guid_cache.json` file tracks all unique GUIDs across tutorials but is not automatically updated when tutorials are added or modified. Currently 7+ months out of date despite monthly tutorial additions.
+
+**Proposed Solution:**
+- GitHub Action in production repo that auto-regenerates `guid_cache.json` on push/merge to main
+- Trigger: When any `tc-*/sidecar.json` file is added or modified
+- Action: Run `python tools/guid_update.py` and commit the updated cache
+- Alternative: Pre-commit hook or PR check that validates GUID uniqueness and updates cache
+
+**Target Repository:** `ciscou-tutorial-content` (production)
+
+**Benefits:**
+- Ensures GUID uniqueness is always enforced
+- Keeps cache in sync with actual tutorials
+- Reduces manual maintenance burden
+
+**Dependencies:** Requires access to modify production repo workflows
