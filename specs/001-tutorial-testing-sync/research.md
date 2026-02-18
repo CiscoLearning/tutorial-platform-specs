@@ -1,0 +1,218 @@
+# Research: Tutorial-Testing Environment Sync
+
+**Feature**: 001-tutorial-testing-sync
+**Date**: 2026-02-18
+
+## Research Questions
+
+1. What is the best approach for syncing content between GitHub repositories?
+2. How should test fixtures be preserved during sync?
+3. What GitHub Actions patterns work best for scheduled + manual triggers?
+4. How to handle the first sync (migration) vs ongoing syncs?
+
+---
+
+## 1. Repository Sync Approaches
+
+### Decision: Use `git fetch` + selective file copy via GitHub Actions
+
+### Rationale
+- GitHub Actions can checkout multiple repositories in the same workflow
+- Using `actions/checkout` with different paths allows side-by-side access
+- Selective rsync/cp operations give precise control over what gets synced
+- No need for git submodules or complex merge strategies
+
+### Alternatives Considered
+
+| Approach | Pros | Cons | Verdict |
+|----------|------|------|---------|
+| Git submodules | Native git, tracks specific commits | Complex, requires user education | Rejected |
+| GitHub fork + upstream sync | Built-in GitHub feature | Syncs everything, no selective control | Rejected |
+| GitHub Actions + checkout | Full control, selective sync | Requires workflow maintenance | **Selected** |
+| External tool (repo-sync) | Purpose-built | External dependency, overkill | Rejected |
+
+### Implementation Pattern
+```yaml
+jobs:
+  sync:
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: org/ciscou-tutorial-content
+          path: production
+          token: ${{ secrets.PROD_REPO_TOKEN }}
+
+      - uses: actions/checkout@v4
+        with:
+          path: testing
+
+      - name: Sync tutorials
+        run: |
+          rsync -av --delete \
+            --exclude='tools/' \
+            --exclude='template/' \
+            --exclude='_test-fixtures/' \
+            production/tc-* testing/
+```
+
+---
+
+## 2. Test Fixture Preservation
+
+### Decision: One-time migration to `_test-fixtures/` folder with exclusion from sync
+
+### Rationale
+- Clear separation between production content and test data
+- Underscore prefix (`_`) is a common convention for special/hidden folders
+- Single exclusion rule in rsync keeps sync logic simple
+- Test fixtures remain version-controlled and accessible
+
+### Implementation Pattern
+```bash
+# One-time migration (manual or scripted)
+mkdir -p _test-fixtures
+mv tc-avocado-test tc-jira-demo tc-broken-link ... _test-fixtures/
+mv poplartest* _test-fixtures/
+git add _test-fixtures/
+git commit -m "Archive test fixtures before production sync"
+```
+
+### Test Fixture Inventory
+From current tutorial-testing repository:
+
+**Test tutorials (27):**
+- tc-a2, tc-avocado-test, tc-broken-link, tc-cache-check, tc-cache-check2
+- tc-cache-check3, tc-d2, tc-ex, tc-full-demo, tc-full-test
+- tc-github-action-test, tc-image-check, tc-jira-demo, tc-jira-new
+- tc-jira-test, tc-jira-test-2, tc-llm-start, tc-new, tc-new-tests
+- tc-presentation-recording, tc-start-to-finish, tc-starting-github-actions-copy
+- tc-tech-test-1213, tc-template-test, tc-whitespace-check, tc-whole, tc-work-check
+
+**Other test content (8):**
+- poplartest, poplartest2, poplartest3, poplartest4
+- poplartest6, poplartest7, poplartest8, poplartest9
+
+**Files to preserve but not archive:**
+- tools/ (source of truth for validation scripts)
+- template/ (tutorial template)
+- README.md (documentation)
+
+---
+
+## 3. GitHub Actions Scheduling Patterns
+
+### Decision: Use `schedule` (cron) + `workflow_dispatch` for dual trigger capability
+
+### Rationale
+- `schedule` provides automated daily runs without intervention
+- `workflow_dispatch` allows manual trigger with optional inputs
+- Both can coexist in the same workflow file
+- GitHub UI provides clear visibility into scheduled runs
+
+### Implementation Pattern
+```yaml
+on:
+  schedule:
+    - cron: '0 4 * * *'  # Daily at 4 AM UTC (overnight for US timezones)
+  workflow_dispatch:
+    inputs:
+      force_full_sync:
+        description: 'Force full sync even if no changes detected'
+        required: false
+        default: 'false'
+        type: boolean
+```
+
+### Schedule Considerations
+- **4 AM UTC** = 11 PM EST / 8 PM PST (previous day)
+- Avoids peak development hours
+- Allows overnight processing before next workday
+- GitHub Actions cron may have up to 15-minute delay
+
+---
+
+## 4. First Sync (Migration) vs Ongoing Syncs
+
+### Decision: Separate one-time setup script from recurring workflow
+
+### Rationale
+- Migration requires careful handling of existing content
+- Recurring sync can be more aggressive (delete removed tutorials)
+- Clear separation prevents accidental re-migration
+- Migration can be done manually with verification steps
+
+### Implementation Pattern
+
+**One-time migration script (`scripts/migrate-to-sync.sh`):**
+```bash
+#!/bin/bash
+set -e
+
+# 1. Create archive folder
+mkdir -p _test-fixtures
+
+# 2. Move test tutorials (those not in production)
+# List generated by comparing testing vs production
+
+# 3. Move poplartest folders
+mv poplartest* _test-fixtures/
+
+# 4. Commit archive
+git add _test-fixtures/
+git commit -m "Archive test fixtures before enabling production sync"
+
+# 5. Perform initial sync
+# (run the sync workflow manually)
+```
+
+**Recurring workflow behavior:**
+- Deletes tutorials that no longer exist in production (--delete flag)
+- Preserves _test-fixtures/ via exclusion
+- Updates guid_cache.json and workflow files
+- Commits and pushes if changes detected
+
+---
+
+## 5. Repository Access and Permissions
+
+### Decision: Use Personal Access Token (PAT) or GitHub App with cross-repo access
+
+### Rationale
+- GITHUB_TOKEN has limited scope (current repo only)
+- Cross-repo checkout requires explicit token with `repo` scope
+- GitHub App is more secure but more complex to set up
+- PAT stored as repository secret is simple and sufficient
+
+### Implementation Pattern
+```yaml
+- uses: actions/checkout@v4
+  with:
+    repository: ${{ vars.PROD_REPO }}  # e.g., "cisco-learning/ciscou-tutorial-content"
+    path: production
+    token: ${{ secrets.PROD_REPO_TOKEN }}
+```
+
+### Required Secrets
+- `PROD_REPO_TOKEN`: PAT with `repo` scope (read access to production repo)
+
+### Required Variables
+- `PROD_REPO`: Full repository name (e.g., `cisco-learning/ciscou-tutorial-content`)
+
+---
+
+## Summary of Decisions
+
+| Question | Decision |
+|----------|----------|
+| Sync approach | GitHub Actions with dual checkout + rsync |
+| Test fixture preservation | One-time migration to `_test-fixtures/` |
+| Scheduling | Daily cron (4 AM UTC) + manual dispatch |
+| First sync handling | Separate migration script + recurring workflow |
+| Repository access | PAT stored as secret |
+
+## Next Steps
+
+1. Create migration script for test fixtures
+2. Implement sync workflow YAML
+3. Document setup process in quickstart.md
+4. Test workflow in tutorial-testing repository
