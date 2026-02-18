@@ -26,7 +26,8 @@
       "Bash(.specify/scripts/bash/check-prerequisites.sh:*)",
       "Bash(git push:*)",
       "Bash(git rm:*)",
-      "Bash(git ls-tree:*)"
+      "Bash(git ls-tree:*)",
+      "Bash(git pull:*)"
     ]
   }
 }

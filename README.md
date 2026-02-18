@@ -5,7 +5,7 @@ This repository serves as the planning and specification workspace for improving
 ## Repository Structure
 
 ```
-agent-ciscou-work/
+tutorial-platform-specs/
 ├── .specify/                    # Spec-Kit templates and project memory
 │   ├── memory/constitution.md   # Project principles and governance
 │   └── specs/                   # Requirements, architecture docs
@@ -22,8 +22,8 @@ To replicate this workspace:
 
 ```bash
 # Clone this specs repo
-git clone <this-repo-url> agent-ciscou-work
-cd agent-ciscou-work
+git clone git@github.com:CiscoLearning/tutorial-platform-specs.git
+cd tutorial-platform-specs
 
 # Clone the sub-repositories
 git clone git@github.com:CiscoLearning/tutorial-testing.git
@@ -80,3 +80,11 @@ None currently.
 - Keep this README updated as features are completed
 - Update the backlog table when starting/completing features
 - Sub-repositories are independent - changes go directly to them
+
+## License
+
+This repository is licensed under the [Apache License 2.0](LICENSE).
+
+**Note:** This repo contains specifications, tooling documentation, and planning artifacts. The actual tutorial content lives in separate repositories:
+- `tutorial-testing` - Public, contains validation tools and synced tutorials
+- `ciscou-tutorial-content` - Private, production tutorial content (Cisco proprietary)
