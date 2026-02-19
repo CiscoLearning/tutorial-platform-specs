@@ -54,7 +54,9 @@ The Cisco U. tutorial platform enables technical content creation through a GitH
 
 ## Functional Requirements
 
-### FR-0: Tutorial-Testing Environment Setup (PREREQUISITE)
+### FR-0: Tutorial-Testing Environment Setup (PREREQUISITE) ✅ COMPLETE
+
+**Status:** Completed 2026-02-18 | [Spec](../../specs/001-tutorial-testing-sync/spec.md)
 
 **Priority:** Critical - Must be completed before other features
 
@@ -102,12 +104,17 @@ The Cisco U. tutorial platform enables technical content creation through a GitH
 - `.github/workflows/*.yml`
 - `schema.json` (if in prod root)
 
-### FR-1: Enhanced Markdown Validation
+### FR-1: Enhanced Markdown Validation ✅ COMPLETE
+
+**Status:** Completed 2026-02-18 | [Spec](../../specs/002-enhanced-markdown-validation/spec.md) | [Deliverables](../../specs/002-enhanced-markdown-validation/deliverables.md)
+
 Validate markdown files for issues that cause XML conversion failures:
 - Whitespace before/after links
 - Improper newlines around inline elements
 - Invalid image/file references
 - Code block formatting issues
+
+**Results:** 41% reduction in false positives, 7 detection rules, 50 unit tests. See [scan results](../../specs/002-enhanced-markdown-validation/scan-results-snapshot.md) for details.
 
 ### FR-2: Editorial Style Validation
 Automatically check for style guide compliance based on editorial patterns:
