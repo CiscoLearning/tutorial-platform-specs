@@ -14,12 +14,12 @@ This document captures a point-in-time snapshot of markdown validation issues fo
 | Metric | Before Fixes | After Fixes | Change |
 |--------|--------------|-------------|--------|
 | Total tutorials scanned | 138 | 138 | - |
-| Tutorials with blocking issues | 52 | 28 | -46% |
-| Total issues | 2,080 | 1,977 | -5% |
-| Blocking issues | 308 | 205 | -33% |
+| Tutorials with blocking issues | 52 | 19 | -63% |
+| Total issues | 2,080 | 1,955 | -6% |
+| Blocking issues | 308 | 183 | -41% |
 | Warnings | 1,772 | 1,772 | - |
-| **Blocking rate** | 37.7% | 20.3% | -17pp |
-| Clean tutorials | 12 | 18 | +50% |
+| **Blocking rate** | 37.7% | 13.8% | -24pp |
+| Clean tutorials | 12 | 24 | +100% |
 
 ---
 
@@ -33,8 +33,8 @@ This document captures a point-in-time snapshot of markdown validation issues fo
 | DOUBLE_SPACE | 354 | 354 | - | WARNING |
 | HTML_TAG | 125 | 125 | - | BLOCKING |
 | CODE_BLOCK_IN_LIST | 145 | 42 | -71% | BLOCKING |
-| LINK_NO_SPACE_AFTER | 19 | 19 | - | BLOCKING |
-| LINK_NO_SPACE_BEFORE | 80 | 15 | -81% | BLOCKING |
+| LINK_NO_SPACE_AFTER | 19 | 9 | -53% | BLOCKING |
+| LINK_NO_SPACE_BEFORE | 80 | 3 | -96% | BLOCKING |
 | LINK_BROKEN | 2 | 2 | - | BLOCKING |
 | LIST_INDENT_INCONSISTENT | 2 | 2 | - | BLOCKING |
 

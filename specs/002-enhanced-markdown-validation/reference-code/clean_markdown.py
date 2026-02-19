@@ -102,8 +102,10 @@ class ValidationResult:
 # Regex patterns for detection
 HTML_TAG_PATTERN = re.compile(r'<(br|p|div|span|hr|img)([^>]*)/?>', re.IGNORECASE)
 # Exclude images (!) from "missing space before link" detection
-LINK_NO_SPACE_BEFORE_PATTERN = re.compile(r'[^\s!]\[[^\]]+\]\([^)]+\)')
-LINK_NO_SPACE_AFTER_PATTERN = re.compile(r'\[[^\]]+\]\([^)]+\)[^\s\.\,\!\?\;\:\)\]\}]')
+# Exclude: whitespace, ! (images), ( (parenthetical links), * (bold links)
+LINK_NO_SPACE_BEFORE_PATTERN = re.compile(r'[^\s!(*]\[[^\]]+\]\([^)]+\)')
+# Exclude: whitespace, punctuation, ), ], }, *, _ (markdown), ' (possessive)
+LINK_NO_SPACE_AFTER_PATTERN = re.compile(r'\[[^\]]+\]\([^)]+\)[^\s\.\,\!\?\;\:\)\]\}\*\_\']')
 LINK_BROKEN_PATTERN = re.compile(r'\[[^\]]*\n[^\]]*\]\([^)]*\)', re.MULTILINE)
 TRAILING_WHITESPACE_PATTERN = re.compile(r'[ \t]+$', re.MULTILINE)
 DOUBLE_SPACE_PATTERN = re.compile(r'(?<=\S) {2,}(?=\S)')

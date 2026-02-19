@@ -100,6 +100,30 @@ class TestLinkSpacing:
         issues = check_link_spacing_after(content)
         assert len(issues) == 0
 
+    def test_allows_bold_link_after(self):
+        """Bold links like **[link](url)** should not flag the closing asterisks"""
+        content = "a tool called **[Cowrie](https://github.com/cowrie)** is popular"
+        issues = check_link_spacing_after(content)
+        assert len(issues) == 0, "Bold link ending should not be flagged"
+
+    def test_allows_italic_link_after(self):
+        """Italic links with underscore like _[link](url)_ should not be flagged"""
+        content = "see _[documentation](https://docs.example.com)_ for details"
+        issues = check_link_spacing_after(content)
+        assert len(issues) == 0, "Italic link ending should not be flagged"
+
+    def test_allows_possessive_after_link(self):
+        """Possessive apostrophe after link like ([CA](url))'s should not be flagged"""
+        content = "the certificate authority's ([CA](https://example.com))'s service"
+        issues = check_link_spacing_after(content)
+        assert len(issues) == 0, "Possessive after link should not be flagged"
+
+    def test_real_missing_space_after_flagged(self):
+        """Actual missing space after link should be flagged"""
+        content = "Visit [site](https://example.com)now for info"
+        issues = check_link_spacing_after(content)
+        assert len(issues) == 1, "Real missing space should be flagged"
+
     def test_link_in_list(self):
         content = "- Click [here](https://example.com) for info"
         issues_before = check_link_spacing_before(content)
@@ -118,6 +142,36 @@ class TestLinkSpacing:
         content = "See the screenshot![image](url)here"
         issues = check_link_spacing_before(content)
         assert len(issues) == 0, "Image syntax should not be flagged"
+
+    def test_parenthetical_link_not_flagged(self):
+        """Parenthetical links like text ([RFC 8894](url)) should not be flagged"""
+        content = "SCEP ([RFC 8894](https://www.rfc-editor.org/rfc/rfc8894.html)) is a protocol"
+        issues = check_link_spacing_before(content)
+        assert len(issues) == 0, "Parenthetical link syntax should not be flagged"
+
+    def test_multiple_parenthetical_links(self):
+        """Multiple parenthetical links in same line"""
+        content = "network ([RA VPN](url)) and certificate ([CSR](url))"
+        issues = check_link_spacing_before(content)
+        assert len(issues) == 0, "Parenthetical links should not be flagged"
+
+    def test_bold_link_not_flagged(self):
+        """Bold links like **[Cowrie](url)** should not be flagged"""
+        content = "a tool called **[Cowrie](https://github.com/cowrie/cowrie)**"
+        issues = check_link_spacing_before(content)
+        assert len(issues) == 0, "Bold link syntax should not be flagged"
+
+    def test_italic_link_not_flagged(self):
+        """Italic links like *[text](url)* should not be flagged"""
+        content = "see the *[documentation](https://docs.example.com)*"
+        issues = check_link_spacing_before(content)
+        assert len(issues) == 0, "Italic link syntax should not be flagged"
+
+    def test_real_missing_space_still_flagged(self):
+        """Actual missing space should still be flagged"""
+        content = "Click[here](https://example.com) to continue"
+        issues = check_link_spacing_before(content)
+        assert len(issues) == 1, "Real missing space should be flagged"
 
 
 class TestBrokenLinks:
