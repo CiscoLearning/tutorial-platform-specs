@@ -7,13 +7,28 @@
 
 ### Comment Generation Points
 
-| Step | Comment Logic | Output Quality |
-|------|---------------|----------------|
-| Schema Validation | Reads `schema_output.txt`, posts content | Good - shows actual errors |
-| Pytest Checks | Generic "click for more info" message | Poor - no error details |
-| XML Conversion | Posts full `transform_stderr.log` | Too verbose - needs parsing |
-| Solomon Lint | Posts warnings to comment | OK - but mixed with noise |
-| AI Analysis | Posts `llm_output.txt` | Good - structured output |
+| Step | Comment Logic | Output Quality | Fallback Needed |
+|------|---------------|----------------|-----------------|
+| Folder Check | Fails silently - no comment | Poor - must check logs | Yes |
+| Folder Naming | Fails silently - no comment | Poor - must check logs | Yes |
+| Subfolder Requirements | Fails silently - no comment | Poor - must check logs | Yes |
+| Schema Validation | Reads `schema_output.txt`, posts content | Good - shows actual errors | No |
+| Pytest Checks | Generic "click for more info" message | Poor - no error details | Yes (priority) |
+| Markdown Validation | Posts `pr_comment.md` | Good - shows details | No |
+| XML Conversion | Posts full `transform_stderr.log` | Too verbose - needs parsing | Partial |
+| Solomon Lint | Posts raw `linting_output.log` | OK - but raw format | Partial |
+| AI Analysis | Posts `llm_output.txt` | Good - structured output | No |
+
+### Pytest Test Coverage (errors hidden behind "click for more info")
+
+| Test Name | Error Type | Current Visibility | Custom Format Needed |
+|-----------|------------|-------------------|---------------------|
+| `test_broken_links` | Broken URLs, Images | Hidden in logs | Yes (P1) |
+| `test_duration_sum` | Duration mismatch | Hidden in logs | Yes (P3) |
+| `test_guid_uniqueness` | Duplicate GUIDs | Hidden in logs | Fallback OK |
+| `test_extra_md_files` | Unexpected .md files | Hidden in logs | Fallback OK |
+| `test_skill_levels` | Invalid skill level | Hidden in logs | Fallback OK |
+| `test_technologies` | Invalid technology | Hidden in logs | Fallback OK |
 
 ### Pytest Output Analysis
 

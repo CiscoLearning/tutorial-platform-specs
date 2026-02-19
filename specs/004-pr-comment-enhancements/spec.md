@@ -53,6 +53,22 @@ A tutorial author submits a PR where the total duration in sidecar.json doesn't 
 
 ---
 
+### User Story 4 - Fallback for Unspecified Error Types (Priority: P4)
+
+A tutorial author submits a PR and the CI fails with an error type that doesn't have custom formatting (e.g., GUID uniqueness, extra markdown files, Solomon lint warnings). Instead of seeing only "click for more info", the author sees the raw output from that validation step captured directly in the PR comment.
+
+**Why this priority**: Future-proofs the system. As new validation checks are added, they automatically get surfaced even before custom formatting is implemented.
+
+**Independent Test**: Can be tested by intentionally triggering an error type without custom formatting and verifying the raw output appears in the comment.
+
+**Acceptance Scenarios**:
+
+1. **Given** a PR fails a validation step without custom error formatting, **When** CI completes, **Then** the PR comment includes the raw output from that step in a collapsible section
+2. **Given** a new validation check is added to CI, **When** it produces errors, **Then** those errors are surfaced in PR comments without requiring code changes to the comment formatter
+3. **Given** multiple unformatted error types occur, **When** CI completes, **Then** each is displayed in its own labeled section
+
+---
+
 ### Edge Cases
 
 - What happens when a PR has multiple error types (broken URLs AND XML errors)?
@@ -61,6 +77,10 @@ A tutorial author submits a PR where the total duration in sidecar.json doesn't 
   - Show first 10 with a count of remaining, collapse full list in details section
 - How does the system handle URLs that timeout vs return 404?
   - Both should be reported as "Broken URL" with the HTTP status or timeout indicated
+- What happens when an error type has no custom formatter?
+  - Fall back to displaying raw output in a collapsible section with the step name as header
+- What happens when raw output is extremely large (>10KB)?
+  - Truncate with "... output truncated, see Actions log for full details"
 
 ## Requirements *(mandatory)*
 
@@ -76,15 +96,21 @@ A tutorial author submits a PR where the total duration in sidecar.json doesn't 
 - **FR-008**: System MUST collapse verbose output (raw logs, full error traces) in expandable sections
 - **FR-009**: System MUST use visual indicators (icons/emoji) to distinguish error severity (blocking vs warning)
 - **FR-010**: System MUST continue showing schema validation errors in current format (already working well)
+- **FR-011**: System MUST capture raw output from any failing validation step that lacks custom formatting
+- **FR-012**: System MUST display unformatted errors in labeled collapsible sections using step name as header
+- **FR-013**: System MUST truncate raw output exceeding 10KB with link to full Actions log
+- **FR-014**: System MUST surface errors from all validation steps (pytest, solomon transform, solomon lint, folder checks) rather than generic "click for more info"
 
 ### Key Entities
 
 - **ValidationError**: Represents a single error found during validation
-  - Type (broken_url, missing_image, xml_error, duration_mismatch)
-  - File path and line number
+  - Type (broken_url, missing_image, xml_error, duration_mismatch, guid_uniqueness, extra_files, skill_level, solomon_lint, folder_structure, other)
+  - Source step (pytest, schema, markdown, solomon_transform, solomon_lint, folder_check)
+  - File path and line number (if available)
   - Specific error value (URL, image path, etc.)
   - Severity (blocking, warning)
   - Fix suggestion (if available)
+  - Raw output (for fallback display when no custom formatter exists)
 
 - **PRComment**: The formatted markdown comment posted to the PR
   - Error sections grouped by type
