@@ -214,6 +214,69 @@ Start with **Option A** for P1 requirements (quick win), refactor to **Option B*
 - **FF-4 (GUID Cache Updates)**: Could be added to same CI enhancement effort
 - **FR-2 (Editorial Style)**: Will build on this validation framework
 
+## Lessons Learned
+
+### 1. False Positive Detection is Critical
+
+**Problem**: Initial CODE_BLOCK_IN_LIST detection flagged 848 issues in first 50 production tutorials (96% of all blocking issues). Investigation revealed most were false positives.
+
+**Root Cause**: The detection logic set `in_list = True` when seeing a list item but never reset it. Any code block appearing anywhere after a list started was flagged, even when properly separated by blank lines.
+
+**Fix**: Track blank lines after list content. A blank line followed by non-indented content ends the list context. Only flag code blocks that appear immediately after list items without blank line separation.
+
+**Impact**: ~90% reduction in CODE_BLOCK_IN_LIST issues (from 848 to ~100 in first 50 tutorials).
+
+**Lesson**: Always test detection rules against real-world content before deployment. High issue counts are a red flag for false positives.
+
+### 2. Comprehensive Unit Tests Prevent Regressions
+
+Created `tests/test_detection_rules.py` with 38 tests covering:
+- Edge cases for each detection rule
+- Real-world patterns extracted from production tutorials
+- Both positive cases (should detect) and negative cases (should NOT detect)
+
+Test categories:
+- `TestHTMLTags`: 6 tests
+- `TestLinkSpacing`: 8 tests
+- `TestBrokenLinks`: 4 tests
+- `TestListIndent`: 4 tests
+- `TestCodeBlockInList`: 9 tests (most critical after false positive discovery)
+- `TestTrailingWhitespace`: 4 tests
+- `TestDoubleSpace`: 3 tests
+
+### 3. Production Tutorials May Have Hidden Fixes
+
+Many tutorials with "blocking" issues still work on Cisco U. because:
+- UAT team applied manual XML fixes after conversion
+- XML converter is more tolerant than expected
+- Issues were fixed in UAT but source markdown was never updated
+
+This means the repo markdown is not always the source of truth for what's live.
+
+### 4. AI Context Matters for Complex Fixes
+
+For AI-powered fixes (nested lists, code blocks in lists), the detection function must capture the FULL context block, not just the problematic line. Original implementation only passed single lines to AI, which couldn't understand the structure to fix.
+
+**Fix**: Detection functions now capture entire list blocks or list-item-plus-code-block contexts for AI processing.
+
+### 5. Image Syntax vs Link Syntax
+
+**Problem**: LINK_NO_SPACE_BEFORE flagged 80 issues in first 100 tutorials, many were false positives.
+
+**Root Cause**: Pattern `\S\[[^\]]+\]\([^)]+\)` matches any non-whitespace before `[`. But image syntax `![alt](url)` intentionally has `!` before `[`.
+
+**Fix**: Changed pattern to `[^\s!]\[[^\]]+\]\([^)]+\)` - excludes `!` from triggering the rule.
+
+**Impact**: 92% reduction (80 → 6 issues in first 100 tutorials).
+
+**Lesson**: When detecting patterns, consider related syntax that shares similar structure.
+
+### 6. Graceful Degradation for Optional Dependencies
+
+The XML conversion test requires `LEARNING_TOKEN` with access to LearningAtCisco private repos. Not all contributors have this access.
+
+**Solution**: Download step sets an output flag. Subsequent steps check the flag and skip gracefully rather than failing the entire workflow.
+
 ## Implementation Summary
 
 **Completed**: 2026-02-18

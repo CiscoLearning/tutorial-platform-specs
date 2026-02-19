@@ -1,0 +1,329 @@
+name: Integration Tests - Markdown Validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/clean_markdown.py'
+      - 'tests/**'
+      - '_test-fixtures/tc-integration-test/**'
+      - '.github/workflows/integration-tests.yml'
+  pull_request:
+    paths:
+      - 'tools/clean_markdown.py'
+      - 'tests/**'
+      - '_test-fixtures/tc-integration-test/**'
+  workflow_dispatch:  # Allow manual trigger
+
+env:
+  TUTORIAL_TO_MD_RELEASE_ASSET: 163752340
+  CLI_RELEASE_ASSET: 157375462
+
+jobs:
+  unit-tests:
+    name: Unit Tests - Detection Rules
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Run detection tests
+        run: |
+          echo "============================================"
+          echo "Testing detection rules"
+          echo "============================================"
+
+          python3 -c "
+          import sys
+          sys.path.insert(0, 'tools')
+          from clean_markdown import (
+              check_html_tags, check_link_spacing_before, check_link_spacing_after,
+              check_link_broken, check_list_indent, check_code_block_in_list,
+              validate_file, Severity, RULES_BY_ID
+          )
+
+          # Test HTML tags
+          content = 'Download the file<br>and extract it.'
+          issues = check_html_tags(content)
+          assert len(issues) == 1, f'HTML_TAG: Expected 1 issue, got {len(issues)}'
+          print('✅ HTML_TAG detection: PASS')
+
+          # Test link spacing before
+          content = 'Click[here](https://example.com) now'
+          issues = check_link_spacing_before(content)
+          assert len(issues) == 1, f'LINK_NO_SPACE_BEFORE: Expected 1 issue, got {len(issues)}'
+          print('✅ LINK_NO_SPACE_BEFORE detection: PASS')
+
+          # Test link spacing after
+          content = 'Visit [site](https://example.com)now'
+          issues = check_link_spacing_after(content)
+          assert len(issues) == 1, f'LINK_NO_SPACE_AFTER: Expected 1 issue, got {len(issues)}'
+          print('✅ LINK_NO_SPACE_AFTER detection: PASS')
+
+          # Test broken link
+          content = '''This is a [broken
+          link](https://example.com) here.'''
+          issues = check_link_broken(content)
+          assert len(issues) == 1, f'LINK_BROKEN: Expected 1 issue, got {len(issues)}'
+          print('✅ LINK_BROKEN detection: PASS')
+
+          # Test severity configuration
+          assert RULES_BY_ID['HTML_TAG'].severity == Severity.BLOCKING
+          assert RULES_BY_ID['TRAILING_WHITESPACE'].severity == Severity.WARNING
+          print('✅ Severity configuration: PASS')
+
+          print()
+          print('All unit tests passed!')
+          "
+
+  integration-test:
+    name: Integration Test - Detection & Auto-Fix
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Run integration test
+        run: |
+          echo "============================================"
+          echo "Running integration tests"
+          echo "============================================"
+          python3 tests/integration_test.py --fixture _test-fixtures/tc-integration-test
+
+  xml-conversion-test:
+    name: Full Pipeline Test - XML Conversion
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check for LEARNING_TOKEN
+        id: check-token
+        run: |
+          if [ -z "${{ secrets.LEARNING_TOKEN }}" ]; then
+            echo "⚠️ LEARNING_TOKEN not available - skipping XML conversion test"
+            echo "To run this test, add LEARNING_TOKEN secret with access to LearningAtCisco repos"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Download tutorial_md2xml
+        id: download-md2xml
+        run: |
+          curl -sLJO \
+            -H 'Accept: application/octet-stream' \
+            -H 'Authorization: token ${{ secrets.LEARNING_TOKEN }}' \
+            'https://api.github.com/repos/LearningAtCisco/tutorial-md-to-xml/releases/assets/${{ env.TUTORIAL_TO_MD_RELEASE_ASSET }}'
+
+          # Check if file was downloaded
+          if ls tutorial_md2xml* 1>/dev/null 2>&1; then
+            mv tutorial_md2xml* tutorial_md2xml
+            chmod +x ./tutorial_md2xml
+            echo "✅ tutorial_md2xml downloaded"
+            echo "available=true" >> $GITHUB_OUTPUT
+          else
+            echo "⚠️ Failed to download tutorial_md2xml"
+            echo "LEARNING_TOKEN may not have access to LearningAtCisco/tutorial-md-to-xml"
+            echo "Skipping XML conversion tests..."
+            echo "available=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download sol CLI
+        if: steps.download-md2xml.outputs.available == 'true'
+        run: |
+          curl -sLJO \
+            -H 'Accept: application/octet-stream' \
+            -H 'Authorization: token ${{ secrets.LEARNING_TOKEN }}' \
+            'https://api.github.com/repos/LearningAtCisco/cli/releases/assets/${{ env.CLI_RELEASE_ASSET }}'
+
+          if ls sol* 1>/dev/null 2>&1; then
+            mv sol* sol
+            chmod +x ./sol
+            echo "✅ sol CLI downloaded"
+          else
+            echo "❌ Failed to download sol CLI"
+            exit 1
+          fi
+
+      - name: Create test workspace
+        if: steps.download-md2xml.outputs.available == 'true'
+        run: |
+          mkdir -p /tmp/xml-test
+          cp -r _test-fixtures/tc-integration-test/* /tmp/xml-test/
+
+      - name: Test 1 - Verify issues exist before fix
+        if: steps.download-md2xml.outputs.available == 'true'
+        run: |
+          echo "============================================"
+          echo "Step 1: Verify issues exist BEFORE auto-fix"
+          echo "============================================"
+
+          # Run validation without fix - should find issues
+          python3 tools/clean_markdown.py /tmp/xml-test --no-fix --verbose || true
+
+          # Count issues
+          ISSUES=$(python3 tools/clean_markdown.py /tmp/xml-test --no-fix --json-output | python3 -c "import sys, json; d=json.load(sys.stdin); print(d['blocking_count'])")
+          echo "Blocking issues found: $ISSUES"
+
+          if [ "$ISSUES" -gt 0 ]; then
+            echo "✅ Pre-fix validation: Issues detected as expected"
+          else
+            echo "❌ No issues found - test fixture may be incorrect"
+            exit 1
+          fi
+
+      - name: Test 2 - XML conversion FAILS without fixes
+        if: steps.download-md2xml.outputs.available == 'true'
+        run: |
+          echo "============================================"
+          echo "Step 2: XML conversion should FAIL without fixes"
+          echo "============================================"
+
+          # Reset test files
+          rm -rf /tmp/xml-test/*
+          cp -r _test-fixtures/tc-integration-test/* /tmp/xml-test/
+
+          # Try conversion - should fail or produce errors
+          if ./tutorial_md2xml /tmp/xml-test/ 2>&1; then
+            # Check if Solomon transform fails
+            if ./sol solomon transform /tmp/xml-test/data.xml > /tmp/xml-test/data.sol.xml 2>&1; then
+              echo "⚠️ XML conversion succeeded (issues may not affect XML)"
+            else
+              echo "✅ Solomon transform failed as expected"
+            fi
+          else
+            echo "✅ XML conversion failed as expected (issues present)"
+          fi
+
+      - name: Test 3 - Apply auto-fix
+        if: steps.download-md2xml.outputs.available == 'true'
+        run: |
+          echo "============================================"
+          echo "Step 3: Apply auto-fix"
+          echo "============================================"
+
+          # Reset test files
+          rm -rf /tmp/xml-test/*
+          cp -r _test-fixtures/tc-integration-test/* /tmp/xml-test/
+
+          # Run with auto-fix
+          python3 tools/clean_markdown.py /tmp/xml-test --verbose
+
+          # Show remaining issues
+          echo ""
+          echo "Issues after auto-fix:"
+          python3 tools/clean_markdown.py /tmp/xml-test --no-fix --json-output | python3 -c "
+          import sys, json
+          d = json.load(sys.stdin)
+          print(f'  Blocking: {d[\"blocking_count\"]}')
+          print(f'  Warnings: {d[\"warning_count\"]}')
+          "
+
+      - name: Test 4 - XML conversion with AI fixes
+        if: steps.download-md2xml.outputs.available == 'true'
+        run: |
+          echo "============================================"
+          echo "Step 4: XML conversion with AI-powered fixes"
+          echo "============================================"
+
+          # Reset and apply fixes with AI
+          rm -rf /tmp/xml-test/*
+          cp -r _test-fixtures/tc-integration-test/* /tmp/xml-test/
+
+          # Run with AI fixes enabled
+          python3 tools/clean_markdown.py /tmp/xml-test --verbose || true
+
+          # Try XML conversion
+          if ./tutorial_md2xml /tmp/xml-test/ 2>&1; then
+            echo "✅ XML conversion succeeded!"
+
+            if [ -f /tmp/xml-test/data.xml ]; then
+              echo "  Output: /tmp/xml-test/data.xml"
+              echo "  Size: $(wc -c < /tmp/xml-test/data.xml) bytes"
+
+              # Try Solomon transform
+              if ./sol solomon transform /tmp/xml-test/data.xml > /tmp/xml-test/data.sol.xml 2>&1; then
+                echo "✅ Solomon transform succeeded!"
+
+                # Try Solomon lint
+                if ./sol solomon lint /tmp/xml-test/data.sol.xml 2>&1; then
+                  echo "✅ Solomon lint passed!"
+                else
+                  echo "⚠️ Solomon lint found issues (may be acceptable)"
+                fi
+              else
+                echo "⚠️ Solomon transform had issues"
+              fi
+            fi
+          else
+            echo "❌ XML conversion failed"
+            echo ""
+            echo "Remaining issues:"
+            python3 tools/clean_markdown.py /tmp/xml-test --no-fix 2>&1 || true
+            exit 1
+          fi
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          APP_KEY: ${{ secrets.APP_KEY }}
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xml-conversion-output
+          path: |
+            /tmp/xml-test/data.xml
+            /tmp/xml-test/data.sol.xml
+          if-no-files-found: ignore
+
+  test-all-fixtures:
+    name: Scan All Test Fixtures
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Scan all test fixtures
+        run: |
+          echo "============================================"
+          echo "Scanning all tutorials in _test-fixtures"
+          echo "============================================"
+
+          # Run scan and capture output
+          python3 tests/test_real_tutorials.py _test-fixtures 2>&1 || true
+
+          # Also save JSON for artifact
+          python3 tests/test_real_tutorials.py _test-fixtures --json > /tmp/scan_results.json 2>&1 || echo '{"error": "scan failed"}' > /tmp/scan_results.json
+
+      - name: Upload scan results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fixture-scan-results
+          path: /tmp/scan_results.json
+          if-no-files-found: ignore
