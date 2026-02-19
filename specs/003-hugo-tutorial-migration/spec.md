@@ -12,7 +12,7 @@
 ## Scope
 
 ### In Scope
-- Migration of ~96 tutorials from Hugo format to current format
+- Migration of ~98 tutorials from Hugo format to current format
 - Automated conversion tooling
 - Content review during migration
 - Schema mapping with documentation
@@ -71,7 +71,8 @@
 | MIG-009 | Generate 1 PR per tutorial | P1 |
 | MIG-010 | PR description includes original text and migration changes | P1 |
 | MIG-011 | PR description includes schema mapping rationale | P1 |
-| MIG-012 | Review each tutorial for improvements during migration | P2 |
+| MIG-012 | Review each tutorial for improvements during migration (manual PR review) | P2 |
+| MIG-013 | Standardize Congratulations step with boilerplate content | P1 |
 
 ### Non-Functional Requirements
 
@@ -171,7 +172,7 @@ def migrate_tutorial(hugo_path: str, output_path: str) -> MigrationResult:
 | ia-guid | ia-guid | Direct copy |
 | lesson-guid | lesson-guid | Direct copy |
 | categories | technologies | Best-effort mapping (see table below) |
-| tags | keywords (in description) | Append to description |
+| tags | (discarded) | Not used in sidecar schema |
 | skilllevels | skill-levels | Map or default to "Intermediate" |
 
 **Category to Technology Mapping:**
@@ -195,6 +196,46 @@ def migrate_tutorial(hugo_path: str, output_path: str) -> MigrationResult:
 | First step (usually "Overview") | step-1.md with label "Overview" |
 | Middle steps | step-2.md through step-(N-1).md |
 | Last step | step-N.md (add "Congratulations" if not present) |
+
+### Congratulations Step Standardization (MIG-013)
+
+The final step of each migrated tutorial MUST use the standard boilerplate while preserving any custom links from the original:
+
+```markdown
+You've completed this tutorial, advancing in your learning journey. To continue building your networking skills, check out our additional tutorials, courses, and learning paths.
+
+**Why Create a Free Cisco U. Account?**
+
+A [Cisco U. account](http://u.cisco.com/?utm_campaign=tofu&utm_source=web-github&utm_medium={tutorial-id}) helps you:
+
+- **Personalize training:** Set your learning goals and pace.
+
+- **Track progress:** Monitor your achievements and learning milestones.
+
+- **Resume anytime:** Continue your learning exactly where you stopped.
+
+**Further Learning Resources**
+
+- [Inside Cisco U.: Step-by-Step Guide to Learning Paths, Courses, Labs, and Tutorials](https://youtu.be/HcpB3--gtvw?si=RWjdqdDKPfQwH-eN)
+
+**Explore more on Cisco U.:**
+
+- [Tutorials](https://u.cisco.com/explore/tutorials?utm_campaign=tofu&utm_source=web-github&utm_medium={tutorial-id})
+- [Video Series](https://u.cisco.com/explore/video-series?utm_campaign=tofu&utm_source=web-github&utm_medium={tutorial-id})
+- [Podcasts](https://u.cisco.com/explore/podcasts?utm_campaign=tofu&utm_source=web-github&utm_medium={tutorial-id})
+- [Events](https://u.cisco.com/explore/events-and-webinars?utm_campaign=tofu&utm_source=web-github&utm_medium={tutorial-id})
+
+**Need Help or Want to Engage?**
+
+- To ask questions and share ideas, join our [Cisco Learning Community](https://learningnetwork.cisco.com/s/topic/0TO3i0000008jYHGAY/ccna-certification-community).
+
+- For technical issues, feedback, or more resources, visit our [Cisco U. Support](https://learning-support.cisco.com/jira/servicedesk/customer/portal/3) page.
+```
+
+**Implementation Notes:**
+- Replace `{tutorial-id}` with the actual tutorial ID (e.g., `tc-ansible-ios`)
+- If the original Congratulations step has custom links (e.g., to related tutorials, specific courses), preserve them in a "Related Content" section before the boilerplate
+- The boilerplate is appended after any existing congratulations message
 
 ---
 
@@ -285,7 +326,7 @@ Migrate: tc-{tutorial-name} from Hugo
 | Tutorials migrated | ~98 |
 | CI pass rate | 100% |
 | PRs requiring manual fixes | <10% |
-| Migration time per tutorial | <5 minutes |
+| Migration time per tutorial | <5 minutes (script <30s + review) |
 
 ---
 
@@ -309,9 +350,9 @@ The following PRs in `cisco-learning-codelabs` contain updates that should be in
 | #205 | Jira fixes october 2025 | Multiple | OPEN |
 | #204 | Cat-Center-J2-Typo | cat-center-j2-* | OPEN |
 | #202 | vim-intro-PACE-27153 | vim-introduction | OPEN |
-| #201 | add CLN link for tut | Unknown | OPEN |
+| #201 | add CLN link for tut | ccna-top-commands | OPEN |
 | #199 | PACE-27153 expandtab typo | vim-introduction | OPEN |
-| #198 | PACE-27585 typo fix | Unknown | OPEN |
+| #198 | PACE-27585 typo fix | ai-python-client (skip - superseded) | OPEN |
 | #197 | Rapid PVST+ Tutorial | rapid-pvst (new) | OPEN |
 | #196 | spotlight template tut | tc-convert-config-template | OPEN |
 
