@@ -12,7 +12,8 @@ tutorial-platform-specs/
 ├── specs/                       # Feature specifications
 │   ├── 001-tutorial-testing-sync/     # Completed: Production sync
 │   ├── 002-enhanced-markdown-validation/  # Completed: 7 detection rules
-│   └── 003-hugo-tutorial-migration/   # Completed: 108 tutorials migrated
+│   ├── 003-hugo-tutorial-migration/   # Completed: 108 tutorials migrated
+│   └── 004-pr-comment-enhancements/   # In Progress: Better CI error surfacing
 ├── CLAUDE.md                    # Claude Code instructions
 ├── tutorial-testing/            # Cloned repo (tools development)
 └── ciscou-tutorial-content/     # Cloned repo (production reference)
@@ -48,7 +49,9 @@ See [.specify/specs/requirements.md](.specify/specs/requirements.md) for the ful
 
 ### In Progress
 
-None currently.
+| Feature | Description | Spec |
+|---------|-------------|------|
+| FR-5: PR Comment Enhancements | Surface CI errors directly in PR comments | [spec](specs/004-pr-comment-enhancements/spec.md) |
 
 ### Backlog
 
@@ -57,7 +60,6 @@ None currently.
 | FR-2 | Editorial Style Validation | High |
 | FR-3 | AI-Powered Editorial Feedback | High |
 | FR-4 | Pre-commit Validation | Medium |
-| FR-5 | PR Comment Enhancements | Medium |
 | FF-1 | AI-Powered Sidecar Generation | Future |
 | FF-2 | Power User Local Workflow CLI | Future |
 | FF-3 | Tutorial Preview Rendering | Future |
