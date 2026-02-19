@@ -2,7 +2,8 @@
 
 **Feature Branch**: `002-enhanced-markdown-validation`
 **Created**: 2026-02-18
-**Status**: Draft
+**Completed**: 2026-02-18
+**Status**: Complete
 **Input**: FR-1 from requirements.md - Validate markdown for XML conversion issues
 
 ## Problem Statement
@@ -30,17 +31,23 @@ A tutorial author submits a PR and receives immediate feedback about markdown pa
 
 ---
 
-### User Story 2 - Whitespace Auto-Fix (Priority: P2)
+### User Story 2 - Auto-Fix (Priority: P2)
 
-Authors can opt to have simple whitespace issues automatically fixed, reducing manual cleanup.
+Simple issues are automatically fixed by default, reducing manual cleanup. Authors can opt out with `--no-fix` flag.
 
 **Acceptance Scenarios:**
 
-1. **Given** a file has trailing whitespace on lines 10, 15, 20, **When** auto-fix runs, **Then** trailing whitespace is removed and commit is amended/pushed.
+1. **Given** a file has trailing whitespace on lines 10, 15, 20, **When** validation runs (default), **Then** trailing whitespace is removed and changes are committed.
 
-2. **Given** a file has `60m00s` duration in sidecar.json, **When** auto-fix runs, **Then** it's converted to `1h00m00s`.
+2. **Given** a file has `60m00s` duration in sidecar.json, **When** validation runs, **Then** it's converted to `1h00m00s`.
 
-3. **Given** auto-fix modifies files, **When** PR is updated, **Then** author sees summary of changes made.
+3. **Given** a nested list has inconsistent indentation, **When** AI reformatting runs, **Then** list is fixed and PR comment shows "Auto-fixed nested list on lines 23-28: [diff or before/after]".
+
+4. **Given** a file link `[text](url)` is missing required spacing around it, **When** AI reformatting runs, **Then** spacing is added and change is shown in PR comment.
+
+5. **Given** author runs with `--no-fix` flag, **When** issues are found, **Then** only warnings are shown, no files modified.
+
+6. **Given** auto-fix modifies files, **When** PR is updated, **Then** author sees summary comment of all changes made (can revert if needed).
 
 ---
 
@@ -67,14 +74,16 @@ Validation clearly distinguishes between issues that will definitely fail vs tho
 | FR-001 | Detect HTML tags (`<br>`, `<p>`, `<div>`, etc.) in markdown content | P1 |
 | FR-002 | Detect inconsistent nested list indentation | P1 |
 | FR-003 | Detect line breaks inside link/image syntax `[text](url)` | P1 |
-| FR-004 | Detect code blocks inside lists with incorrect indentation | P1 |
-| FR-005 | Map validation errors to source markdown line numbers | P1 |
-| FR-006 | Provide actionable fix suggestions for each error type | P1 |
-| FR-007 | Auto-fix trailing whitespace (opt-in) | P2 |
-| FR-008 | Auto-fix double spaces outside code blocks (opt-in) | P2 |
-| FR-009 | Auto-fix duration format in sidecar.json (opt-in) | P2 |
-| FR-010 | Categorize issues as BLOCKING or WARNING | P3 |
-| FR-011 | Continue pipeline on warnings, fail on blockers | P3 |
+| FR-004 | Detect links/images missing required whitespace around them | P1 |
+| FR-005 | Detect code blocks inside lists with incorrect indentation | P1 |
+| FR-006 | Map validation errors to source markdown line numbers | P1 |
+| FR-007 | Provide actionable fix suggestions for each error type | P1 |
+| FR-008 | Auto-fix trailing whitespace (default on, opt-out via `--no-fix`) | P2 |
+| FR-009 | Auto-fix double spaces outside code blocks (default on) | P2 |
+| FR-010 | Auto-fix duration format in sidecar.json (default on) | P2 |
+| FR-011 | AI-powered markdown reformatting (nested lists, link spacing, complex structures) with PR comment showing changes | P2 |
+| FR-012 | Categorize issues as BLOCKING or WARNING | P3 |
+| FR-013 | Continue pipeline on warnings, fail on blockers | P3 |
 
 ### Non-Functional Requirements
 
@@ -140,10 +149,12 @@ Start with **Option A** for P1 requirements (quick win), refactor to **Option B*
 5. Test against historical failing PRs
 
 ### Phase 2: Auto-Fix (P2 Requirements)
-1. Uncomment and enhance auto-fix code in `clean_markdown.py`
+1. Enable auto-fix by default in `clean_markdown.py`
 2. Add duration format auto-fix to `schema_validation.py`
-3. Add `--fix` flag to validation scripts
-4. Update CI to optionally apply fixes
+3. Add `--no-fix` flag for opt-out
+4. Integrate AI (Cisco Chat-AI) for complex markdown reformatting (nested lists, link spacing, code blocks in lists)
+5. Generate PR comment with diff of all auto-fixed changes
+6. Update CI to apply fixes and commit changes
 
 ### Phase 3: Categorization (P3 Requirements)
 1. Classify each rule as BLOCKING or WARNING
@@ -164,6 +175,7 @@ Start with **Option A** for P1 requirements (quick win), refactor to **Option B*
 - Access to historical failing PRs for test cases
 - Understanding of `tutorial_md2xml` converter behavior
 - CI workflow modification permissions
+- Cisco Chat-AI API access (for AI-powered nested list reformatting)
 
 ## Out of Scope
 
@@ -171,13 +183,71 @@ Start with **Option A** for P1 requirements (quick win), refactor to **Option B*
 - Editorial/style validation (that's FR-2/FR-3)
 - Changes to sidecar.json schema (owned by L&C UAT team)
 
-## Open Questions
+## Design Decisions
 
-1. Should auto-fix be opt-in or opt-out?
-2. Should we add a "preview XML" step that catches errors before full conversion?
-3. How do we handle edge cases in nested lists that are valid but unusual?
+1. **Auto-fix is opt-OUT** - Enabled by default. Most authors don't want to deal with manual fixes for trivial issues. Add `--no-fix` flag for those who want control.
+
+2. **No XML preview** - Authors work in markdown; XML conversion is a black box they don't need to see. Focus on catching issues early with clear markdown-centric feedback.
+
+3. **AI-powered markdown reformatting** - Use AI to auto-fix complex issues that regex can't handle reliably: nested lists, link spacing (links need whitespace around them), code blocks in lists, and other structural problems. Include a PR comment showing exactly what was changed so authors can revert or adjust if the AI's formatting doesn't match their intent.
+
+4. **AI failure handling** - If Cisco Chat-AI is unavailable (timeout, rate limit, error), retry up to 3 times with exponential backoff. If still failing, skip AI fixes, report the issue as WARNING in PR comment ("AI reformatting unavailable, manual fix recommended for lines X-Y"), and continue pipeline with regex-only fixes.
+
+5. **AI response validation** - Before applying AI-generated fixes, validate that: (a) URLs are preserved, (b) content length is within 20% of original, (c) code blocks are unchanged. If validation fails, reject the AI fix, keep original content, and report as WARNING ("AI fix rejected - manual fix recommended").
+
+6. **Commit message opt-out** - Authors have two options:
+   - `[no-autofix]` - Skip ALL auto-fixes (both regex and AI)
+   - `[no-ai-fix]` - Skip AI fixes only (regex fixes still apply)
+
+7. **User education** - Every PR comment footer includes: "To disable auto-fix, add `[no-autofix]` to your commit message. Use `[no-ai-fix]` to skip AI fixes only."
+
+## Clarifications
+
+### Session 2026-02-18
+
+- Q: When AI API fails, what should happen? → A: Retry up to 3 times with exponential backoff, then skip AI fixes and report as WARNING (continue pipeline)
+- Q: If AI returns invalid/broken markdown, what should happen? → A: Reject the AI fix, keep original content, report as WARNING with "AI fix rejected - manual fix recommended"
+- Q: Support commit message flag to skip auto-fix? → A: Yes, support both `[no-autofix]` (skip all) and `[no-ai-fix]` (skip AI only, regex still applies). Document in PR comment footer to educate users.
 
 ## Related Features
 
 - **FF-4 (GUID Cache Updates)**: Could be added to same CI enhancement effort
 - **FR-2 (Editorial Style)**: Will build on this validation framework
+
+## Implementation Summary
+
+**Completed**: 2026-02-18
+
+### Deliverables
+
+1. **Enhanced `clean_markdown.py`** (tutorial-testing/tools/)
+   - All 7 detection rules implemented: HTML_TAG, LINK_NO_SPACE_BEFORE, LINK_NO_SPACE_AFTER, LINK_BROKEN, LIST_INDENT, CODE_BLOCK_IN_LIST, TRAILING_WHITESPACE
+   - Auto-fix with regex for simple patterns (HTML tags, spacing, whitespace)
+   - AI-powered reformatting via Cisco Chat-AI for complex issues (nested lists, code blocks in lists)
+   - Severity system (BLOCKING vs WARNING)
+   - CLI with --no-fix, --json-output, --verbose flags
+   - Commit message opt-out support: `[no-autofix]`, `[no-ai-fix]`
+
+2. **Integration Tests** (tutorial-testing/.github/workflows/)
+   - Unit tests for all detection rules
+   - Full XML conversion pipeline test with tutorial_md2xml + Solomon
+   - Test fixtures with all 7 issue types
+
+3. **AI Integration**
+   - OAuth2 authentication with Cisco Chat-AI
+   - Exponential backoff retry (3 attempts)
+   - Response validation (URL preservation, content length, code block protection)
+   - Graceful fallback to WARNING when AI unavailable
+
+### Test Results
+
+Integration tests verified:
+- 19 blocking issues detected in test fixture
+- AI successfully fixed 7/8 issues (nested lists, code blocks in lists)
+- XML conversion succeeded after fixes
+- Solomon transform and lint passed
+
+### Repositories Updated
+
+- **CiscoLearning/tutorial-testing**: PR #101 - Enhanced Markdown Validation
+- **CiscoLearning/ciscou-tutorial-content**: test/integration-xml-pipeline branch (testing)
