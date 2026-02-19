@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/CiscoLearning/tutorial-testing/schemas/validation-error.schema.json",
+  "title": "ValidationError",
+  "description": "A single validation error or warning found during CI pipeline execution",
+  "type": "object",
+  "required": ["type", "source", "message", "severity"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "broken_url",
+        "missing_image",
+        "xml_error",
+        "duration_mismatch",
+        "guid_uniqueness",
+        "extra_files",
+        "skill_level",
+        "technology",
+        "solomon_lint",
+        "folder_structure",
+        "schema",
+        "other"
+      ],
+      "description": "Error category"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "pytest",
+        "schema",
+        "markdown",
+        "solomon_transform",
+        "solomon_lint",
+        "folder_check"
+      ],
+      "description": "Validation step that produced the error"
+    },
+    "file": {
+      "type": "string",
+      "description": "Relative path to affected file",
+      "pattern": "^[a-zA-Z0-9_\\-./]+$"
+    },
+    "line": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Line number where error occurs (1-indexed)"
+    },
+    "value": {
+      "type": "string",
+      "maxLength": 500,
+      "description": "Specific error value (URL, image path, etc.)"
+    },
+    "message": {
+      "type": "string",
+      "description": "Human-readable error description"
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["blocking", "warning"],
+      "description": "Error severity level"
+    },
+    "fix_suggestion": {
+      "type": "string",
+      "description": "Actionable fix instruction"
+    },
+    "raw_output": {
+      "type": "string",
+      "maxLength": 5000,
+      "description": "Original output for fallback display"
+    }
+  }
+}
