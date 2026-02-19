@@ -10,7 +10,9 @@ tutorial-platform-specs/
 │   ├── memory/constitution.md   # Project principles and governance
 │   └── specs/                   # Requirements, architecture docs
 ├── specs/                       # Feature specifications
-│   └── 001-tutorial-testing-sync/  # Completed: Production sync
+│   ├── 001-tutorial-testing-sync/     # Completed: Production sync
+│   ├── 002-enhanced-markdown-validation/  # Completed: 7 detection rules
+│   └── 003-hugo-tutorial-migration/   # Completed: 108 tutorials migrated
 ├── CLAUDE.md                    # Claude Code instructions
 ├── tutorial-testing/            # Cloned repo (tools development)
 └── ciscou-tutorial-content/     # Cloned repo (production reference)
@@ -42,6 +44,7 @@ See [.specify/specs/requirements.md](.specify/specs/requirements.md) for the ful
 |---------|-------------|------|
 | FR-0: Tutorial-Testing Sync | Daily sync of production tutorials to testing repo | [spec](specs/001-tutorial-testing-sync/spec.md) |
 | FR-1: Enhanced Markdown Validation | 7 detection rules, 41% false positive reduction | [spec](specs/002-enhanced-markdown-validation/spec.md) |
+| FF-5: Hugo Tutorial Migration | 108 tutorials migrated, 92% auto-fix rate | [spec](specs/003-hugo-tutorial-migration/spec.md) |
 
 ### In Progress
 
@@ -59,7 +62,6 @@ None currently.
 | FF-2 | Power User Local Workflow CLI | Future |
 | FF-3 | Tutorial Preview Rendering | Future |
 | FF-4 | Automated GUID Cache Updates | Future |
-| FF-5 | Legacy Hugo Tutorial Migration | Future |
 
 ## Workflow
 
