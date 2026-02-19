@@ -41,8 +41,20 @@ python tools/schema_validation.py <tutorial-folder-path>
 # Run pytest validation suite
 python tools/pytest_validation.py
 
-# Check markdown whitespace/formatting
-python tools/clean_markdown.py
+# Check and auto-fix markdown formatting issues (enhanced validation)
+python tools/clean_markdown.py <tutorial-folder-path>
+
+# Check without auto-fix (report only)
+python tools/clean_markdown.py <tutorial-folder-path> --no-fix
+
+# Check without AI-powered fixes (regex fixes only)
+python tools/clean_markdown.py <tutorial-folder-path> --no-ai-fix
+
+# Output as JSON
+python tools/clean_markdown.py <tutorial-folder-path> --json-output
+
+# Generate PR comment format
+python tools/clean_markdown.py <tutorial-folder-path> --pr-comment --no-fix
 
 # Create new tutorial from template
 python tools/template_bootstrap.py
@@ -89,8 +101,29 @@ GitHub Actions workflows in `.github/workflows/`:
 1. Folder structure validation (tc-* naming, images/ folder)
 2. JSON schema validation against `tools/schema.json`
 3. Pytest validation (skill-levels, technologies, duration sums, GUID uniqueness)
-4. Markdown → XML conversion (tutorial_md2xml + Solomon)
-5. AI editorial analysis via Cisco Chat-AI
+4. **Enhanced Markdown Validation** (auto-fix enabled by default)
+5. Markdown → XML conversion (tutorial_md2xml + Solomon)
+6. AI editorial analysis via Cisco Chat-AI
+
+### Enhanced Markdown Validation (FR-002)
+
+The `clean_markdown.py` tool detects and auto-fixes markdown patterns that break XML conversion:
+
+**BLOCKING issues (will fail pipeline):**
+- `HTML_TAG`: HTML tags like `<br>`, `<p>`, `<div>` (auto-fixed: replaced with markdown equivalents)
+- `LINK_NO_SPACE_BEFORE/AFTER`: Missing whitespace around links (auto-fixed)
+- `LINK_BROKEN`: Line breaks inside link syntax (auto-fixed)
+- `LIST_INDENT_INCONSISTENT`: Inconsistent nested list indentation (AI-powered fix)
+- `CODE_BLOCK_IN_LIST`: Code blocks not indented within lists (AI-powered fix)
+
+**WARNING issues (pipeline continues):**
+- `TRAILING_WHITESPACE`: Trailing spaces/tabs (auto-fixed)
+- `DOUBLE_SPACE`: Multiple consecutive spaces (auto-fixed)
+
+**Opt-out options:**
+- Add `[no-autofix]` to commit message to disable all auto-fixes
+- Add `[no-ai-fix]` to disable AI fixes (regex fixes still apply)
+- Use `--no-fix` flag for report-only mode
 
 ### Markdown to XML Conversion
 
@@ -99,6 +132,8 @@ Tutorials are converted from markdown to Cisco U. platform-specific XML. Common 
 - **Whitespace around links:** Extra newlines before/after `[link](url)` syntax
 - **Invalid entities:** Unescaped `&` characters (use `&amp;`)
 - **Nested formatting:** Complex nested markdown can produce malformed XML
+
+**Note:** Most of these issues are now auto-fixed by the Enhanced Markdown Validation step.
 
 Authors currently fix these manually based on pipeline error messages. See [architecture.md](.specify/specs/architecture.md) for the full conversion flow.
 
@@ -157,3 +192,10 @@ For AI analysis and Jira integration:
 | Feature | Spec Location | Date |
 |---------|---------------|------|
 | FR-0: Tutorial-Testing Sync | specs/001-tutorial-testing-sync/ | 2026-02-18 |
+
+## Active Technologies
+- Python 3.10 (per CI workflow) + jsonschema, pytest, requests (existing); Cisco Chat-AI API (existing ai_analysis.py) (002-enhanced-markdown-validation)
+- N/A (file-based validation) (002-enhanced-markdown-validation)
+
+## Recent Changes
+- 002-enhanced-markdown-validation: Added Python 3.10 (per CI workflow) + jsonschema, pytest, requests (existing); Cisco Chat-AI API (existing ai_analysis.py)
