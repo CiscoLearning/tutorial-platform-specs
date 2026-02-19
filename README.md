@@ -38,9 +38,10 @@ See [.specify/specs/requirements.md](.specify/specs/requirements.md) for the ful
 
 ### Completed
 
-| Feature | Description | Status |
-|---------|-------------|--------|
-| FR-0: Tutorial-Testing Sync | Daily sync of production tutorials to testing repo | Done |
+| Feature | Description | Spec |
+|---------|-------------|------|
+| FR-0: Tutorial-Testing Sync | Daily sync of production tutorials to testing repo | [spec](specs/001-tutorial-testing-sync/spec.md) |
+| FR-1: Enhanced Markdown Validation | 7 detection rules, 41% false positive reduction | [spec](specs/002-enhanced-markdown-validation/spec.md) |
 
 ### In Progress
 
@@ -50,7 +51,6 @@ None currently.
 
 | Feature | Description | Priority |
 |---------|-------------|----------|
-| FR-1 | Enhanced Markdown Validation | High |
 | FR-2 | Editorial Style Validation | High |
 | FR-3 | AI-Powered Editorial Feedback | High |
 | FR-4 | Pre-commit Validation | Medium |
@@ -59,6 +59,7 @@ None currently.
 | FF-2 | Power User Local Workflow CLI | Future |
 | FF-3 | Tutorial Preview Rendering | Future |
 | FF-4 | Automated GUID Cache Updates | Future |
+| FF-5 | Legacy Hugo Tutorial Migration | Future |
 
 ## Workflow
 
