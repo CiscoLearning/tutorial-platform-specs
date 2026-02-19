@@ -248,3 +248,53 @@ The following features have been identified but are not in the current scope. Th
 - Reduces manual maintenance burden
 
 **Dependencies:** Requires access to modify production repo workflows
+
+### FF-5: Legacy Hugo Tutorial Migration
+
+**Problem:** A significant number of tutorials exist in the legacy `cisco-learning-codelabs` repository using Hugo/Codelabs format. These tutorials were never migrated to the current `ciscou-tutorial-content` repository structure (markdown + sidecar.json). This content is effectively orphaned and not accessible through the current Cisco U. platform workflow.
+
+**Current State:**
+- Legacy repo: `cisco-learning-codelabs` (Hugo-based Codelabs format)
+- Unknown number of tutorials that may still be valuable
+- Different folder structure and metadata format than current system
+- May have outdated content, broken links, or obsolete technologies
+
+**Proposed Solution:**
+
+1. **Audit legacy content:**
+   - Inventory all tutorials in `cisco-learning-codelabs`
+   - Categorize by: still relevant, needs update, obsolete
+   - Identify content owners/authors where possible
+
+2. **Create migration tooling:**
+   - Script to convert Hugo/Codelabs format to markdown + sidecar.json
+   - Map legacy metadata fields to current sidecar.json schema
+   - Generate GUIDs for migrated tutorials
+   - Preserve images and assets
+
+3. **Content review process:**
+   - Technical review for accuracy (technologies may have changed)
+   - Editorial review for style guide compliance
+   - Validation through current CI pipeline
+
+4. **Migration execution:**
+   - Batch migration with PR per tutorial or small groups
+   - Track migration status in spreadsheet or project board
+   - Archive or deprecate legacy repo after complete migration
+
+**Target Users:**
+- Content consumers who may be missing valuable tutorials
+- Authors who created legacy content
+
+**Effort Estimate:** Medium-High (depends on number of tutorials and content freshness)
+
+**Dependencies:**
+- Access to `cisco-learning-codelabs` repository
+- Content owners available for review
+- Editorial capacity for review pass
+
+**Open Questions:**
+- How many tutorials are in the legacy repo?
+- What percentage are still technically accurate?
+- Who owns the content review responsibility?
+- Should obsolete tutorials be archived or deleted?
