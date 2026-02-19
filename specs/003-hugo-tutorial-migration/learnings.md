@@ -85,13 +85,46 @@ parser error : Opening and ending tag mismatch: ItemPara line 38 and ParaBlock
 - Five Cisco IOS routers...
 ```
 
-**Fix:** Manual fix required - merge the link into the previous list item or add a list marker:
+**Fix:** Manual fix required - see 2d below for the actual solution.
+
+**Affected Tutorials:** DMVPN Phase 1/2/3
+
+---
+
+### 2d. Local File Links in List Items (Solomon XML Compatibility)
+
+**Issue:** Solomon XML parser cannot handle local file links (e.g., `./assets/file.yaml`) inside list items, regardless of how the text is formatted. The link gets converted to a block element that breaks the ItemPara tag structure.
+
+Multiple formatting attempts that all failed:
+```markdown
+# All of these FAIL
+- Cisco Modeling Labs (2.x): [DMVPN YAML File](./assets/DMVPN.yaml)
+- Cisco Modeling Labs (2.x) - [DMVPN YAML File](./assets/DMVPN.yaml)
+- Cisco Modeling Labs (2.x) with the [DMVPN YAML File](./assets/DMVPN.yaml)
+- [DMVPN YAML File](./assets/DMVPN.yaml) for Cisco Modeling Labs 2.x
+```
+
+Error pattern:
+```
+-:38: parser error : Opening and ending tag mismatch: ItemPara line 38 and ParaBlock
+<ItemPara></ParaBlock>
+```
+
+**Important Note:** External URLs (https://) in list items work fine. The issue is specific to local/relative file paths.
+
+**Fix:** Remove the link entirely and reference the file by name:
 
 ```markdown
-# FIXED
-- Cisco Modeling Labs (2.x) - [DMVPN YAML File](./assets/DMVPN.yaml)
-- Five Cisco IOS routers...
+# FIXED - plain text reference
+- Cisco Modeling Labs 2.x with the DMVPN.yaml file from the assets folder
 ```
+
+**Automated Fix:** Added `LOCAL_LINK_IN_LIST` rule to `clean_markdown.py` that:
+1. Detects local file links in list items
+2. Extracts the link and replaces the list item with a text reference
+3. Places the extracted link after the list block
+
+**Location:** `tools/clean_markdown.py` - `fix_local_links_in_list()` function
 
 **Affected Tutorials:** DMVPN Phase 1/2/3
 
@@ -198,10 +231,97 @@ This reduces manual intervention for common formatting issues.
 3. **Check certifications:** Validate against the allowed list before migration
 4. **Test duration parsing:** Ensure duration formats match the target schema
 5. **Remove generated files:** Don't include PR_DESCRIPTION.md or other temp files in tutorial folders
+6. **Avoid local file links in list items:** Use plain text references instead of markdown links to local files (e.g., `./assets/file.yaml`) in list items
+
+---
+
+## Issue Categories: Auto-Fix vs Human Review
+
+### Auto-Fixable Issues (CI can fix automatically)
+
+These issues can be automatically detected and fixed by CI without human intervention:
+
+| Issue | Tool | Fix Strategy |
+|-------|------|--------------|
+| Duration mismatch | `tools/fix_sidecar.py` | Recalculate total from step durations |
+| Bold in list items | `tools/clean_markdown.py` | Strip bold markers, keep text |
+| Blank lines in lists | `tools/clean_markdown.py` | Remove blank lines between list items |
+| Double spaces | `tools/clean_markdown.py` | Replace with single space |
+| Link spacing | `tools/clean_markdown.py` | Add space before/after links |
+| HTML tags | `tools/clean_markdown.py` | Convert `<br>` to newlines, strip tags |
+| Local links in lists | `tools/clean_markdown.py` | Extract link after list block |
+| Trailing whitespace | `tools/clean_markdown.py` | Strip trailing spaces |
+| First/last step labels | CI workflow | Set "Overview" and "Congratulations" |
+
+### Human Review Required (flag for author)
+
+These issues require human judgment and cannot be auto-fixed:
+
+| Issue | Reason | Action |
+|-------|--------|--------|
+| Broken external URLs | URL may have moved, need correct replacement | Flag in PR comment, author finds new URL |
+| Missing images | Image file missing from migration | Flag in PR comment, author uploads image |
+| Complex nested lists | Content restructuring needed | Flag, suggest simplification |
+| Vim-style tutorials | Heavy markdown formatting requires rewrite | Manual content refactoring |
+| Deprecated sandbox URLs | Need to identify replacement sandbox | Author determines if still relevant |
+
+### Example Broken URLs Found in Migration
+
+| URL Pattern | Count | Issue |
+|-------------|-------|-------|
+| `developer.cisco.com/automation-bootcamp/` | 7+ | Page removed |
+| `devnetsandbox.cisco.com/RM/Diagram/...` | 3+ | Old sandbox diagram URLs |
+| `content.cisco.com/chapter.sjs?...` | 2+ | Cisco docs restructured |
+
+---
+
+## Sidecar Auto-Fix Tool
+
+A new tool was created to automatically fix sidecar.json issues:
+
+**Location:** `tools/fix_sidecar.py`
+
+**Usage:**
+```bash
+# Preview changes (dry run)
+python tools/fix_sidecar.py tc-example --dry-run
+
+# Apply fixes
+python tools/fix_sidecar.py tc-example
+```
+
+**Fixes automatically:**
+- Duration mismatch: Updates total duration to match sum of step durations
+
+---
+
+## CI UX Improvement Needed
+
+**Issue:** When CI fails due to broken URLs, the error is only visible in the action logs. Authors need to click through multiple pages to find the actual issue.
+
+**Current flow:**
+1. PR shows CI failure
+2. Click on failed check → GitHub Actions page
+3. Click on job → Job log
+4. Scroll/search for "Broken URL:" or "Broken Image:"
+
+**Proposed improvement (Future Work):**
+- Surface specific errors directly in PR comments
+- Format like:
+  ```
+  ❌ Broken Link Detected
+
+  **File:** step-8.md
+  **URL:** https://developer.cisco.com/automation-bootcamp/
+
+  Please replace with a working URL or remove the link.
+  ```
 
 ---
 
 ## Files Modified
 
 - `.github/workflows/tutorial-linting.yml` - YAML syntax fix and auto-commit feature
-- `tools/clean_markdown.py` - Bold list item conversion, blank lines in lists fix, and actual file modification
+- `tools/clean_markdown.py` - Bold list item conversion, blank lines in lists fix, local file links in lists extraction, and actual file modification
+- `tools/fix_sidecar.py` - NEW: Auto-fix duration mismatches in sidecar.json
+- `.github/workflows/integration-tests.yml` - Added integration tests for XML conversion pipeline
