@@ -251,50 +251,100 @@ The following features have been identified but are not in the current scope. Th
 
 ### FF-5: Legacy Hugo Tutorial Migration
 
-**Problem:** A significant number of tutorials exist in the legacy `cisco-learning-codelabs` repository using Hugo/Codelabs format. These tutorials were never migrated to the current `ciscou-tutorial-content` repository structure (markdown + sidecar.json). This content is effectively orphaned and not accessible through the current Cisco U. platform workflow.
+**Problem:** 110 tutorials exist in the legacy `cisco-learning-codelabs` repository using Hugo/Codelabs format. These tutorials were never migrated to the current `ciscou-tutorial-content` repository structure (markdown + sidecar.json). This content is effectively orphaned and not accessible through the current Cisco U. platform workflow.
 
-**Current State:**
-- Legacy repo: `cisco-learning-codelabs` (Hugo-based Codelabs format)
-- Unknown number of tutorials that may still be valuable
-- Different folder structure and metadata format than current system
-- May have outdated content, broken links, or obsolete technologies
+**Inventory (as of 2026-02-18):**
+
+| Metric | Count |
+|--------|-------|
+| Total tutorials | 110 |
+| Published | 108 |
+| Drafts | 2 |
+| With existing GUIDs | 108 |
+| Already migrated | 3 |
+| **To migrate** | **~105** |
+
+- **Date range:** 2022-03-16 to 2024-04-05
+- **Already in ciscou-tutorial-content:** tc-multicloud-defense-spotlight-2024, tc-ospf-tshoot-1, tc-spotlight-terraformer
+
+**Top Authors:**
+
+| Author | Tutorials |
+|--------|-----------|
+| Jason Belk | 24 |
+| Quinn Snyder | 13 |
+| Rafael Leiva-Ochoa | 9 |
+| Alec Chamberlain | 8 |
+| Robert Whitaker | 6 |
+| Kareem Iskander | 6 |
+| Tony Roman | 5 |
+| Others (15+ authors) | 39 |
+
+**Categories:** Coding, Automation, Networking, Security, Cloud, Data Center, Certification
+
+**Current Hugo Format:**
+```
+posts/tutorial-name/
+├── index.md      # Single file with YAML frontmatter + {{<step>}} shortcodes
+└── images/       # Local images
+```
+
+**Target Format:**
+```
+tc-tutorial-name/
+├── sidecar.json  # Metadata (mapped from YAML frontmatter)
+├── step-1.md     # Overview (extracted from first {{<step>}})
+├── step-2.md ... step-N.md
+├── step-N.md     # Congratulations (extracted from last {{<step>}})
+└── images/       # Copied as-is
+```
+
+**Migration Complexity:** Medium
+
+| Task | Complexity | Notes |
+|------|------------|-------|
+| Parse `{{<step>}}` shortcodes | Low | Regex extraction |
+| Split into step-N.md files | Low | Automated |
+| Map YAML → sidecar.json | Medium | Field mapping + validation |
+| Preserve GUIDs | Low | 108/110 already have GUIDs |
+| Copy images | Low | Direct copy |
+| Content review | High | 2+ year old content may be outdated |
 
 **Proposed Solution:**
 
-1. **Audit legacy content:**
-   - Inventory all tutorials in `cisco-learning-codelabs`
-   - Categorize by: still relevant, needs update, obsolete
-   - Identify content owners/authors where possible
+1. **Create migration script:**
+   - Parse Hugo `index.md` and extract frontmatter + steps
+   - Generate `sidecar.json` from YAML metadata
+   - Split `{{<step>}}` blocks into separate `step-N.md` files
+   - Copy images folder
+   - Validate against current schema
 
-2. **Create migration tooling:**
-   - Script to convert Hugo/Codelabs format to markdown + sidecar.json
-   - Map legacy metadata fields to current sidecar.json schema
-   - Generate GUIDs for migrated tutorials
-   - Preserve images and assets
+2. **Batch migration:**
+   - Run script on all 105 tutorials
+   - Generate PRs in batches of 5-10
+   - CI validates schema and markdown
 
-3. **Content review process:**
-   - Technical review for accuracy (technologies may have changed)
-   - Editorial review for style guide compliance
-   - Validation through current CI pipeline
+3. **Content triage:**
+   - Flag tutorials >18 months old for technical review
+   - Authors review their own content where possible
+   - Editorial pass for style guide compliance
 
-4. **Migration execution:**
-   - Batch migration with PR per tutorial or small groups
-   - Track migration status in spreadsheet or project board
-   - Archive or deprecate legacy repo after complete migration
+4. **Archive legacy repo:**
+   - After migration complete, archive `cisco-learning-codelabs`
+   - Redirect any external links if applicable
 
-**Target Users:**
-- Content consumers who may be missing valuable tutorials
-- Authors who created legacy content
-
-**Effort Estimate:** Medium-High (depends on number of tutorials and content freshness)
+**Effort Estimate:**
+- Migration tooling: 1-2 days
+- Batch migration (105 tutorials): 1 day
+- Content review: 2-4 weeks (depends on author availability)
+- Total: ~1 month with parallel content review
 
 **Dependencies:**
 - Access to `cisco-learning-codelabs` repository
-- Content owners available for review
+- Content owners available for review (especially Jason Belk - 24 tutorials)
 - Editorial capacity for review pass
 
 **Open Questions:**
-- How many tutorials are in the legacy repo?
-- What percentage are still technically accurate?
-- Who owns the content review responsibility?
+- What percentage of 2022-2023 content is still technically accurate?
 - Should obsolete tutorials be archived or deleted?
+- Who approves final migration for each tutorial?
