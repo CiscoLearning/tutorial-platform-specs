@@ -51,6 +51,52 @@ parser error : Opening and ending tag mismatch: ItemPara line 38 and ParaBlock
 
 ---
 
+### 2b. Blank Lines Between List Items (Solomon XML Compatibility)
+
+**Issue:** Solomon XML parser cannot handle blank lines between consecutive list items. This causes the same ItemPara/ParaBlock tag mismatches as bold list items.
+
+```markdown
+# BROKEN - blank lines between list items
+- First item
+
+- Second item
+
+- Third item
+```
+
+**Fix:** Added automatic removal of blank lines between list items in `clean_markdown.py`:
+- The fix detects sequences of: list item → blank line(s) → list item
+- Removes the blank lines while preserving blank lines after the list ends
+
+**Location:** `tools/clean_markdown.py` - `fix_blank_lines_in_list()` function
+
+**Affected Tutorials:** This pattern was common in the "Learn More" sections of migrated tutorials, particularly the "Cisco U. account helps you" lists.
+
+---
+
+### 2c. Standalone Links Breaking List Structure
+
+**Issue:** Some tutorials had links on their own line without list markers, breaking the list structure:
+
+```markdown
+# BROKEN - link without list marker
+- Cisco Modeling Labs (2.x)
+[DMVPN YAML File](./assets/DMVPN.yaml)
+- Five Cisco IOS routers...
+```
+
+**Fix:** Manual fix required - merge the link into the previous list item or add a list marker:
+
+```markdown
+# FIXED
+- Cisco Modeling Labs (2.x) - [DMVPN YAML File](./assets/DMVPN.yaml)
+- Five Cisco IOS routers...
+```
+
+**Affected Tutorials:** DMVPN Phase 1/2/3
+
+---
+
 ### 3. Invalid Certification Names
 
 **Issue:** Hugo tutorials had certification abbreviations (SVPN, SCOR, SISE, ENCC, ENNA, SCAZT) that aren't in the valid certification list.
@@ -158,4 +204,4 @@ This reduces manual intervention for common formatting issues.
 ## Files Modified
 
 - `.github/workflows/tutorial-linting.yml` - YAML syntax fix and auto-commit feature
-- `tools/clean_markdown.py` - Bold list item conversion and actual file modification
+- `tools/clean_markdown.py` - Bold list item conversion, blank lines in lists fix, and actual file modification
