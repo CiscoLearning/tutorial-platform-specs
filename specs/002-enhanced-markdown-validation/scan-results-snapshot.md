@@ -1,6 +1,6 @@
 # Validation Scan Results Snapshot
 
-**Scan Date**: 2026-02-18
+**Scan Date**: 2026-02-18 (updated after false positive fixes)
 **Tool Version**: clean_markdown.py (FR-1 Enhanced Markdown Validation)
 
 This document captures a point-in-time snapshot of markdown validation issues found in tutorial content. Some tutorials may have been fixed on the UAT side but the source markdown in the repo remains unchanged.
@@ -9,59 +9,34 @@ This document captures a point-in-time snapshot of markdown validation issues fo
 
 ## Summary
 
-### Test Fixtures (_test-fixtures/)
+### Production Tutorials (Full Scan - 138 tutorials)
 
-| Metric | Value |
-|--------|-------|
-| Total tutorials scanned | 28 |
-| Tutorials with issues | 6 |
-| Tutorials with blocking issues | 5 |
-| Clean tutorials | 22 |
-| Total issues | 198 |
-| Blocking issues | 52 |
-| Warnings | 146 |
-| **Blocking rate** | 17.9% |
-
-### Production Tutorials (ciscou-tutorial-content/, first 50)
-
-| Metric | Value |
-|--------|-------|
-| Total tutorials scanned | 50 |
-| Tutorials with issues | 49 |
-| Tutorials with blocking issues | 33 |
-| Clean tutorials | 1 |
-| Total issues | 1,822 |
-| Blocking issues | 880 |
-| Warnings | 942 |
-| **Blocking rate** | 66.0% |
+| Metric | Before Fixes | After Fixes | Change |
+|--------|--------------|-------------|--------|
+| Total tutorials scanned | 138 | 138 | - |
+| Tutorials with blocking issues | 52 | 28 | -46% |
+| Total issues | 2,080 | 1,977 | -5% |
+| Blocking issues | 308 | 205 | -33% |
+| Warnings | 1,772 | 1,772 | - |
+| **Blocking rate** | 37.7% | 20.3% | -17pp |
+| Clean tutorials | 12 | 18 | +50% |
 
 ---
 
 ## Issues by Rule
 
-### Test Fixtures
+### Production Tutorials (138 tutorials, after fixes)
 
-| Rule | Count | Severity |
-|------|-------|----------|
-| TRAILING_WHITESPACE | 140 | WARNING |
-| CODE_BLOCK_IN_LIST | 39 | BLOCKING |
-| DOUBLE_SPACE | 6 | WARNING |
-| HTML_TAG | 3 | BLOCKING |
-| LINK_NO_SPACE_BEFORE | 3 | BLOCKING |
-| LINK_NO_SPACE_AFTER | 3 | BLOCKING |
-| LINK_BROKEN | 2 | BLOCKING |
-| LIST_INDENT_INCONSISTENT | 2 | BLOCKING |
-
-### Production Tutorials (first 50)
-
-| Rule | Count | Severity |
-|------|-------|----------|
-| CODE_BLOCK_IN_LIST | 848 | BLOCKING |
-| TRAILING_WHITESPACE | 834 | WARNING |
-| DOUBLE_SPACE | 108 | WARNING |
-| HTML_TAG | 23 | BLOCKING |
-| LINK_NO_SPACE_AFTER | 6 | BLOCKING |
-| LINK_NO_SPACE_BEFORE | 3 | BLOCKING |
+| Rule | Before Fixes | After Fixes | Change | Severity |
+|------|--------------|-------------|--------|----------|
+| TRAILING_WHITESPACE | 1,418 | 1,418 | - | WARNING |
+| DOUBLE_SPACE | 354 | 354 | - | WARNING |
+| HTML_TAG | 125 | 125 | - | BLOCKING |
+| CODE_BLOCK_IN_LIST | 145 | 42 | -71% | BLOCKING |
+| LINK_NO_SPACE_AFTER | 19 | 19 | - | BLOCKING |
+| LINK_NO_SPACE_BEFORE | 80 | 15 | -81% | BLOCKING |
+| LINK_BROKEN | 2 | 2 | - | BLOCKING |
+| LIST_INDENT_INCONSISTENT | 2 | 2 | - | BLOCKING |
 
 ---
 

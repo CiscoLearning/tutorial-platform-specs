@@ -422,6 +422,10 @@ def check_code_block_in_list(content: str, file_path: str = "") -> List[Validati
     blank_line_seen = False  # Track if we've seen a blank line after list content
 
     for line_num, line in enumerate(lines, 1):
+        # Skip lines inside code blocks - they may contain list-like syntax
+        if is_in_code_block(lines, line_num - 1):
+            continue
+
         list_match = list_pattern.match(line)
         if list_match:
             in_list = True

@@ -297,6 +297,24 @@ print("hello")
         issues = check_code_block_in_list(content)
         assert len(issues) == 0
 
+    def test_list_inside_code_block_not_flagged(self):
+        """List-like syntax inside code block should NOT be detected as a list"""
+        content = """Some text
+
+```
+config example
+1. First item in code
+2. Second item in code
+```
+
+More text"""
+        issues = check_code_block_in_list(content)
+        assert len(issues) == 0, "List syntax inside code blocks should be ignored"
+
+    # Known limitation: 4-backtick fences (````text) with nested 3-backtick
+    # content may cause false positives. This is a rare edge case used for
+    # displaying code that contains code blocks (e.g., AI agent traces).
+
     def test_code_block_not_in_list_context(self):
         """Code block that was never in a list"""
         content = """Some paragraph text.
