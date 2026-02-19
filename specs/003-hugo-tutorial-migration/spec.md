@@ -300,8 +300,61 @@ Migrate: tc-{tutorial-name} from Hugo
 
 ---
 
-## Open Questions
+## Open PRs to Incorporate
 
-1. Should we batch PRs by author for easier review assignment?
-2. What's the preferred order - alphabetical, by date, by author?
-3. Should outdated tutorials get a banner/note added?
+The following PRs in `cisco-learning-codelabs` contain updates that should be incorporated during migration:
+
+| PR | Title | Tutorial | Status |
+|----|-------|----------|--------|
+| #205 | Jira fixes october 2025 | Multiple | OPEN |
+| #204 | Cat-Center-J2-Typo | cat-center-j2-* | OPEN |
+| #202 | vim-intro-PACE-27153 | vim-introduction | OPEN |
+| #201 | add CLN link for tut | Unknown | OPEN |
+| #199 | PACE-27153 expandtab typo | vim-introduction | OPEN |
+| #198 | PACE-27585 typo fix | Unknown | OPEN |
+| #197 | Rapid PVST+ Tutorial | rapid-pvst (new) | OPEN |
+| #196 | spotlight template tut | tc-convert-config-template | OPEN |
+
+**Action:** Review each open PR and incorporate changes into the migrated version.
+
+---
+
+## Migration Order (by Author)
+
+Tutorials will be migrated in batches by author, starting with highest volume:
+
+| Order | Author | Count | Notes |
+|-------|--------|-------|-------|
+| 1 | Jason Belk | 24 | Includes skipped tutorials |
+| 2 | Quinn Snyder | 13 | |
+| 3 | Rafael Leiva-Ochoa | 9 | |
+| 4 | Alec Chamberlain | 8 | |
+| 5 | Robert Whitaker | 6 | |
+| 6 | Kareem Iskander | 6 | |
+| 7 | Tony Roman | 5 | |
+| 8 | Barry Weiss | 4 | |
+| 9 | Story DeWeese | 3 | |
+| 10 | Randy Aubel | 3 | |
+| 11 | Mark Brereton | 3 | |
+| 12 | Kate Dignan | 3 | |
+| 13 | John Capobianco | 3 | |
+| 14 | Jim Risler | 2 | |
+| 15 | Hank Preston | 2 | |
+| 16 | David Bombal | 2 | Includes skipped tutorials |
+| 17 | Aron Donaldson | 2 | |
+| 18 | Andrew Stinson | 2 | |
+| 19 | Abdiel Hernandez | 2 | |
+| 20+ | Others (8 authors) | 8 | 1 tutorial each |
+
+**Total:** 27 authors, ~98 tutorials after skips
+
+---
+
+## Decisions Made
+
+| Question | Decision |
+|----------|----------|
+| Batch by author? | Yes - all tutorials by same author in sequence |
+| Migration order? | By author, highest volume first |
+| Outdated content? | All tutorials are 2+ years old; no special banner needed |
+| Open PRs? | Incorporate updates during migration |
