@@ -2,7 +2,9 @@
 
 **Feature Branch**: `004-pr-comment-enhancements`
 **Created**: 2026-02-19
-**Status**: Draft
+**Completed**: 2026-02-20
+**Status**: Complete
+**PR**: [ciscou-tutorial-content#343](https://github.com/CiscoLearning/ciscou-tutorial-content/pull/343)
 **Input**: User description: "FR-5: PR Comment Enhancements - Improve automated PR comments to surface specific errors directly instead of requiring authors to navigate GitHub Actions logs. Based on pain points discovered during Hugo migration where broken URLs, missing images, and XML errors were hidden in logs."
 
 ## User Scenarios & Testing *(mandatory)*
@@ -140,3 +142,145 @@ A tutorial author submits a PR and the CI fails with an error type that doesn't 
 - Preventing errors before commit (covered by FR-4: Pre-commit Validation)
 - Changing the underlying validation logic
 - Modifying the PR review/approval workflow
+
+---
+
+## Implementation Details
+
+### Code Files (ciscou-tutorial-content repo)
+
+| File | Purpose | Key Functions |
+|------|---------|---------------|
+| `tools/conftest.py` | Pytest plugin for JSON output | `JSONResultCollector`, `_parse_broken_urls()`, `_parse_missing_images()`, `_parse_duration_mismatch()` |
+| `tools/format_pr_comment.py` | PR comment markdown generator | `format_broken_url_errors()`, `format_missing_image_errors()`, `format_duration_mismatch()`, `format_xml_errors()` |
+| `tools/pytest_validation.py` | Validation tests with line tracking | `extract_links_with_lines()`, `check_file()`, `test_broken_links()` |
+| `.github/workflows/tutorial-linting.yml` | CI workflow integration | Added `--json-output` flag and formatter step |
+
+### Architecture
+
+```
+pytest_validation.py                    conftest.py                     format_pr_comment.py
+┌─────────────────────┐                ┌─────────────────────┐         ┌─────────────────────┐
+│ test_broken_links() │ ──failures──▶ │ JSONResultCollector │ ──JSON─▶│ generate_comment()  │
+│ test_duration()     │                │ _parse_broken_urls()│         │ format_*_errors()   │
+│ etc.                │                │ _parse_images()     │         │ collapsible_section │
+└─────────────────────┘                └─────────────────────┘         └─────────────────────┘
+        │                                       │                              │
+        │ Outputs:                              │ Outputs:                     │ Outputs:
+        │ "Broken URL (line 15): url"           │ pytest_results.json          │ pytest_comment.md
+        │ "Broken Image (line 20): path"        │ {errors: [...]}              │ (markdown tables)
+```
+
+### Key Design Decisions
+
+1. **Pytest plugin via conftest.py**: Pytest automatically loads `conftest.py`, making plugin registration seamless
+2. **Regex-based error parsing**: Parse structured error messages from pytest output rather than modifying pytest internals
+3. **Line number tracking**: Modified `extract_links_with_lines()` to return `(value, line_num)` tuples throughout the chain
+4. **Severity levels**: Blocking (broken URLs, missing images) vs Warning (duration mismatch) for visual distinction
+
+---
+
+## Development Notes & Lessons Learned
+
+### Iteration 1: Initial Implementation (tutorial-testing repo)
+- Created `conftest.py` with JSON output plugin
+- Created `format_pr_comment.py` with table formatters
+- Updated workflow to use `--json-output`
+
+### Iteration 2: YAML Syntax Error
+**Problem**: Workflow failed to parse - `**Status:**` at the start of a line inside a multiline string was interpreted as a YAML alias (`*Status`).
+
+**Fix**: Added indentation before the `**` to prevent YAML from treating it as an alias marker.
+
+```yaml
+# Before (broken)
+gh pr comment "$PR_NUMBER" --body "## Report
+**Status:** passed"   # YAML sees *Status as alias
+
+# After (fixed)
+gh pr comment "$PR_NUMBER" --body "## Report
+          **Status:** passed"   # Indented, not at line start
+```
+
+### Iteration 3: Pytest Plugin Not Loading
+**Problem**: `--json-output` flag was "unrecognized" because the plugin code was in `pytest_validation.py` but pytest wasn't loading it.
+
+**Fix**: Moved plugin registration to `tools/conftest.py`. Pytest automatically discovers and loads `conftest.py` files.
+
+### Iteration 4: URL Parsing Artifacts
+**Problem**: URLs showing trailing characters like `https://example.com/page')])]`
+
+**Root cause**: Regex `https?://[^\s]+` was too greedy, capturing brackets and quotes from surrounding markdown/code.
+
+**Fix**: Improved regex to stop at common delimiters:
+```python
+# Before
+url_pattern = re.compile(r"(https?://[^\s]+)")
+
+# After
+url_pattern = re.compile(r"(https?://[^\s\n\]\)\"']+)")
+# Also added post-processing:
+clean_url = re.sub(r"[\]\)\'\"\,\.]+$", "", url)
+```
+
+### Iteration 5: Line Numbers Missing
+**Problem**: PR comment showed `| unknown | - |` for file and line columns.
+
+**Root cause**: `pytest_validation.py` was outputting `"Broken URL: {url}"` without line numbers, so `conftest.py` couldn't parse them.
+
+**Fix**:
+1. Added `extract_links_with_lines()` function to track line numbers during link extraction
+2. Modified `check_file()` to return `(url, line_num)` tuples
+3. Updated error output format to `"Broken URL (line {n}): {url}"`
+
+```python
+def extract_links_with_lines(md_content):
+    """Extract links with line numbers."""
+    url_links = []
+    for line_num, line in enumerate(md_content.split('\n'), start=1):
+        urls = re.findall(MARKDOWN_URL_REGEX, line)
+        for url in urls:
+            url_links.append((url, line_num))
+    return url_links, image_links
+```
+
+### Iteration 6: Duration Table Placeholders
+**Problem**: Duration mismatch table showed `(from step sum)` and `(in sidecar)` instead of actual values like `35m00s` and `25m00s`.
+
+**Root cause**: `format_pr_comment.py` wasn't parsing the expected/actual values from the error message.
+
+**Fix**: Added regex to extract values from message:
+```python
+# Parse "Duration mismatch: expected 35m00s, got 25m00s"
+duration_pattern = re.compile(r"expected\s+(\d+[hm]?\d*[ms]?\d*s?),?\s+got\s+(\d+[hm]?\d*[ms]?\d*s?)")
+match = duration_pattern.search(error.message)
+if match:
+    expected_val = match.group(1)  # "35m00s"
+    actual_val = match.group(2)    # "25m00s"
+```
+
+### Iteration 7: CI Not Triggering (tutorial-testing)
+**Problem**: After fixing YAML, GitHub Actions workflows weren't triggering on new commits/PRs.
+
+**Investigation**: Workflow only had `on: pull_request:` trigger. When the workflow file itself had a syntax error, GitHub cached the invalid state.
+
+**Workaround**: Tested on production repo (ciscou-tutorial-content) instead, which had working CI. The fixes were validated there.
+
+### Iteration 8: Test Tutorial vs Production Code
+**Problem**: Initial test PR included both the test fixture (`tc-fr5-validation-test/`) and the actual code changes.
+
+**Fix**: Created clean branch from main, cherry-picked only the code files:
+```bash
+git checkout main
+git checkout -b feat/fr5-pr-comment-enhancements
+git checkout test/fr5-validation -- tools/conftest.py tools/format_pr_comment.py \
+    tools/pytest_validation.py .github/workflows/tutorial-linting.yml
+```
+
+### Key Takeaways
+
+1. **Test on prod when CI is broken on test**: When tutorial-testing CI had issues, validating on ciscou-tutorial-content provided faster feedback
+2. **YAML multiline strings are tricky**: Special characters at line starts can be misinterpreted as YAML syntax
+3. **Pytest plugin discovery**: Use `conftest.py` for automatic plugin loading
+4. **Parse structured output**: Design error messages to be both human-readable AND machine-parseable
+5. **Separate test fixtures from production code**: Keep dummy test data out of production branches

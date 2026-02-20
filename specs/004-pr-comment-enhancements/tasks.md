@@ -133,7 +133,7 @@ All paths relative to `tutorial-testing/` repository:
 - [X] T035 [P] Add multi-error-type handling - each type gets own section with clear headers per edge case spec in tools/format_pr_comment.py
 - [X] T036 [P] Update README.md in tutorial-testing with format_pr_comment.py usage documentation
 - [X] T037 Verify GitHub PR comment size limit (65,536 chars) handling with truncation in tools/format_pr_comment.py
-- [ ] T038 End-to-end validation: Create test PR with multiple error types and verify comment output
+- [X] T038 End-to-end validation: Create test PR with multiple error types and verify comment output
 - [X] T039 Remove old "click for more info" comment logic from workflow in .github/workflows/tutorial-linting.yml
 
 ---
