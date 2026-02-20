@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/CiscoLearning/tutorial-testing/schemas/validation-result.schema.json",
+  "title": "ValidationResult",
+  "description": "Aggregated result from a single validation step",
+  "type": "object",
+  "required": ["step", "status", "errors"],
+  "properties": {
+    "step": {
+      "type": "string",
+      "description": "Name of the validation step"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["passed", "failed", "skipped"],
+      "description": "Step execution result"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "validation-error.schema.json"
+      },
+      "description": "List of errors found (empty if passed)"
+    },
+    "summary": {
+      "type": "string",
+      "description": "Brief description of result"
+    },
+    "duration_ms": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Step execution time in milliseconds"
+    }
+  }
+}

@@ -196,6 +196,8 @@ For AI analysis and Jira integration:
 ## Active Technologies
 - Python 3.10 (per CI workflow) + jsonschema, pytest, requests (existing); Cisco Chat-AI API (existing ai_analysis.py) (002-enhanced-markdown-validation)
 - N/A (file-based validation) (002-enhanced-markdown-validation)
+- Python 3.10 (matches existing tools in tutorial-testing) + pytest, requests, jsonschema (already in use) (004-pr-comment-enhancements)
+- N/A (file-based JSON output for inter-step communication) (004-pr-comment-enhancements)
 
 ## Recent Changes
 - 002-enhanced-markdown-validation: Added Python 3.10 (per CI workflow) + jsonschema, pytest, requests (existing); Cisco Chat-AI API (existing ai_analysis.py)
