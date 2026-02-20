@@ -200,29 +200,35 @@ The following features have been identified but are not in the current scope. Th
 
 **Dependencies:** Requires analysis of existing tag patterns across 146+ tutorials
 
-### FF-2: Power User Local Workflow CLI
+### FF-2: Tutorial Creation Workflows ✅ COMPLETE
+
+**Status:** Completed 2026-02-20 | [Spec](../../specs/006-tutorial-creation-workflows/spec.md) | [PR](https://github.com/CiscoLearning/ciscou-tutorial-content/pull/344)
 
 **Problem:** Technical authors want faster iteration without waiting for CI pipeline. Non-technical authors need guided setup.
 
-**Proposed Solution:**
-- Local CLI tool that provides:
-  - Interactive tutorial creation wizard (prompts for title, duration, skill level, etc.)
-  - Auto-creates branch (`tc-{name}`), folder structure, and initial sidecar.json
-  - Local validation with auto-fix for common issues
-  - Push to remote when ready
-- Two modes:
-  - **Guided mode:** Step-by-step prompts for non-technical users
-  - **Power mode:** Quick commands with auto-fix for experienced authors
+**Solution Implemented:**
 
-**Target Users:**
-- Power users: Technical Advocates who create many tutorials
-- Guided mode: Instructors and TMEs less familiar with Git
+Three parallel workflows targeting different user skill levels:
 
-**Key Features:**
-- `tutorial new` - Interactive wizard to create new tutorial
-- `tutorial validate` - Run all checks locally
-- `tutorial fix` - Auto-fix markdown and sidecar issues
-- `tutorial push` - Validate, fix, and push to remote
+1. **GitHub Issue Form** (Non-technical users)
+   - Fill out form → Action creates folder + PR automatically
+   - Zero setup required, edit markdown in GitHub UI
+
+2. **GitHub Codespace** (Light technical users)
+   - Pre-configured VS Code in browser
+   - Python 3.10, dependencies, VS Code tasks pre-installed
+
+3. **Interactive CLI Wizard** (Power users)
+   - `python tools/tutorial_wizard.py`
+   - Step-by-step prompts, generates all files, creates git branch
+
+**Files Created:**
+- `.github/ISSUE_TEMPLATE/new-tutorial.yml` - Issue form
+- `.github/workflows/create-tutorial.yml` - Action to process issues
+- `.devcontainer/devcontainer.json` - Codespace config
+- `tools/tutorial_wizard.py` - Interactive CLI
+- `tools/create_tutorial_from_issue.py` - Issue parser
+- `CONTRIBUTING.md` - Author guide
 
 ### FF-3: Tutorial Preview Rendering
 

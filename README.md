@@ -14,7 +14,8 @@ tutorial-platform-specs/
 │   ├── 002-enhanced-markdown-validation/  # Completed: 7 detection rules
 │   ├── 003-hugo-tutorial-migration/   # Completed: 108 tutorials migrated
 │   ├── 004-pr-comment-enhancements/   # In Progress: Better CI error surfacing
-│   └── 005-pre-commit-validation/     # Completed: GUID auto-generation
+│   ├── 005-pre-commit-validation/     # Completed: GUID auto-generation
+│   └── 006-tutorial-creation-workflows/  # Completed: Issue form + Codespace
 ├── CLAUDE.md                    # Claude Code instructions
 ├── tutorial-testing/            # Cloned repo (tools development)
 └── ciscou-tutorial-content/     # Cloned repo (production reference)
@@ -48,6 +49,7 @@ See [.specify/specs/requirements.md](.specify/specs/requirements.md) for the ful
 | FR-1: Enhanced Markdown Validation | 7 detection rules, 41% false positive reduction | [spec](specs/002-enhanced-markdown-validation/spec.md) |
 | FF-5: Hugo Tutorial Migration | 108 tutorials migrated, 92% auto-fix rate | [spec](specs/003-hugo-tutorial-migration/spec.md) |
 | FR-4: Pre-commit Validation | GUID auto-generation on PR, local validation CLI, 29 unit tests | [spec](specs/005-pre-commit-validation/spec.md) |
+| FF-2: Tutorial Creation Workflows | Issue form, Codespace, CLI wizard for all skill levels | [spec](specs/006-tutorial-creation-workflows/spec.md) |
 
 ### In Progress
 
@@ -62,7 +64,6 @@ See [.specify/specs/requirements.md](.specify/specs/requirements.md) for the ful
 | FR-2 | Editorial Style Validation | High |
 | FR-3 | AI-Powered Editorial Feedback | High |
 | FF-1 | AI-Powered Sidecar Generation | Future |
-| FF-2 | Power User Local Workflow CLI | Future |
 | FF-3 | Tutorial Preview Rendering | Future |
 
 ## Workflow
