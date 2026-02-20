@@ -131,12 +131,16 @@ Enhance existing `ai_analysis.py` to provide:
 - Quality score with breakdown by category
 - Comparison to editorial patterns from historical commits
 
-### FR-4: Pre-commit Validation
-Provide local validation before pushing:
-- Schema validation
-- Duration sum check
-- GUID uniqueness check
-- Basic style checks
+### FR-4: Pre-commit Validation & Automated GUID Handling ✅ COMPLETE
+
+**Status:** Completed 2026-02-20 | [Spec](../../specs/005-pre-commit-validation/spec.md)
+
+Automated GUID handling in CI pipeline plus local validation for power users:
+- Auto-detect missing, invalid, or duplicate GUIDs on PR
+- Auto-generate new UUIDs and commit to PR branch
+- Update guid_cache.json on merge
+- Local validation CLI (`validate_tutorial.py`) for power users
+- 29 unit tests covering all GUID scenarios
 
 ### FR-5: PR Comment Enhancements
 Improve automated PR comments to include:
