@@ -1,8 +1,21 @@
 # FF-2: Tutorial Creation Workflows
 
 **Status:** Complete
-**PR:** [ciscou-tutorial-content#344](https://github.com/CiscoLearning/ciscou-tutorial-content/pull/344)
+**PRs:** [#344](https://github.com/CiscoLearning/ciscou-tutorial-content/pull/344), [#345](https://github.com/CiscoLearning/ciscou-tutorial-content/pull/345)
 **Date:** 2026-02-20
+
+## Reference Code
+
+All implementation code is in the [reference-code/](./reference-code/) directory:
+
+| File | Purpose |
+|------|---------|
+| `new-tutorial.yml` | GitHub Issue form template |
+| `create-tutorial.yml` | GitHub Action workflow |
+| `create_tutorial_from_issue.py` | Parses issue and generates files |
+| `tutorial_wizard.py` | Interactive CLI wizard |
+| `devcontainer.json` | Codespace configuration |
+| `test_tutorial_creation.py` | 40 unit tests |
 
 ## Problem Statement
 
@@ -234,6 +247,44 @@ You have successfully completed **{title}**!
    - Folder created with correct structure
    - sidecar.json valid
    - Git branch created (if selected)
+
+## Tutorial Analysis
+
+Form options were informed by analysis of 140+ existing tutorials:
+
+### Step Count Distribution
+
+| Total Steps | Count | % |
+|-------------|-------|---|
+| 5 | 15 | 11% |
+| 6 | 32 | 23% |
+| 7 | 21 | 15% |
+| 8 | 29 | 21% |
+| 9 | 18 | 13% |
+| 10 | 8 | 6% |
+| 11 | 5 | 4% |
+| 12+ | 11 | 8% |
+
+**Decision:** Offer 3-10 content steps (5-12 total including Overview/Congratulations)
+
+### Duration
+
+- Max duration: 60 minutes (platform requirement)
+- Most common: 30-50 minutes
+
+**Decision:** 5-minute increments from 15-60 minutes
+
+### Technology Distribution
+
+| Technology | Count |
+|------------|-------|
+| Networking | 51 |
+| Security | 36 |
+| Software | 14 |
+| Data Center | 11 |
+| Application Performance | 9 |
+| Cloud and Computing | 7 |
+| Collaboration | 5 |
 
 ## Related Documentation
 

@@ -1,0 +1,165 @@
+name: Create Tutorial from Issue
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  create-tutorial:
+    if: github.event.label.name == 'new-tutorial'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Create tutorial from issue
+        id: create-tutorial
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+        run: |
+          python tools/create_tutorial_from_issue.py
+
+      - name: Create branch and commit
+        if: steps.create-tutorial.outputs.folder_name != ''
+        env:
+          FOLDER_NAME: ${{ steps.create-tutorial.outputs.folder_name }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          BRANCH_NAME="${FOLDER_NAME}"
+          git checkout -b "$BRANCH_NAME"
+
+          git add "${FOLDER_NAME}/"
+          git commit -m "Create tutorial: ${FOLDER_NAME}
+
+          Auto-generated from issue #${{ github.event.issue.number }}
+
+          Co-Authored-By: github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+
+          git push origin "$BRANCH_NAME"
+
+          echo "branch_name=${BRANCH_NAME}" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
+        if: steps.create-tutorial.outputs.folder_name != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FOLDER_NAME: ${{ steps.create-tutorial.outputs.folder_name }}
+          TUTORIAL_TITLE: ${{ steps.create-tutorial.outputs.tutorial_title }}
+        run: |
+          PR_URL=$(gh pr create \
+            --title "New Tutorial: ${TUTORIAL_TITLE}" \
+            --body "$(cat <<'EOF'
+          ## New Tutorial Created
+
+          This PR was auto-generated from issue #${{ github.event.issue.number }}.
+
+          ### Next Steps
+
+          1. **Edit the markdown files** directly in this PR:
+             - Click on "Files changed" tab above
+             - Click the pencil icon (✏️) on any `.md` file to edit
+             - Add your tutorial content
+             - Commit your changes
+
+          2. **Add images** (if needed):
+             - Upload images to the `${FOLDER_NAME}/images/` folder
+             - Reference them in markdown: `![Alt text](images/your-image.png)`
+
+          3. **Adjust step durations** in `sidecar.json`:
+             - Update the `duration` field for each step
+             - Ensure they sum to the total duration
+
+          4. **Request review** when ready:
+             - The CI will validate your tutorial automatically
+             - Request a reviewer to merge
+
+          ### Files Created
+
+          - `${FOLDER_NAME}/sidecar.json` - Tutorial metadata
+          - `${FOLDER_NAME}/step-*.md` - Tutorial steps
+          - `${FOLDER_NAME}/images/` - Image folder (empty)
+
+          ---
+          🤖 Generated with [Tutorial Creator Action](https://github.com/CiscoLearning/ciscou-tutorial-content/blob/main/.github/workflows/create-tutorial.yml)
+          EOF
+          )" \
+            --head "${FOLDER_NAME}" \
+            --base main)
+
+          echo "pr_url=${PR_URL}" >> $GITHUB_OUTPUT
+          echo "PR created: ${PR_URL}"
+
+      - name: Comment on issue
+        if: steps.create-tutorial.outputs.folder_name != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FOLDER_NAME: ${{ steps.create-tutorial.outputs.folder_name }}
+        run: |
+          PR_URL=$(gh pr list --head "${FOLDER_NAME}" --json url --jq '.[0].url')
+
+          gh issue comment ${{ github.event.issue.number }} --body "$(cat <<EOF
+          ## ✅ Tutorial Created!
+
+          Your tutorial folder has been created and a Pull Request is ready for you to edit.
+
+          **📝 Edit your tutorial here:** ${PR_URL}
+
+          ### What's next?
+
+          1. Click the PR link above
+          2. Go to "Files changed" tab
+          3. Click the pencil icon (✏️) on any \`.md\` file
+          4. Write your tutorial content
+          5. Commit your changes
+          6. Request a review when done!
+
+          ### Files created:
+          - \`${FOLDER_NAME}/sidecar.json\` - Metadata (auto-populated)
+          - \`${FOLDER_NAME}/step-1.md\` - Overview
+          - \`${FOLDER_NAME}/step-*.md\` - Content steps
+          - \`${FOLDER_NAME}/images/\` - Add your images here
+
+          ---
+          🤖 This issue will be automatically closed when the PR is merged.
+          EOF
+          )"
+
+      - name: Link issue to PR
+        if: steps.create-tutorial.outputs.folder_name != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FOLDER_NAME: ${{ steps.create-tutorial.outputs.folder_name }}
+        run: |
+          # The PR already references the issue, so it will auto-close on merge
+          # Just add a label to track status
+          gh issue edit ${{ github.event.issue.number }} --add-label "pr-created"
+
+      - name: Handle errors
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue comment ${{ github.event.issue.number }} --body "$(cat <<EOF
+          ## ❌ Tutorial Creation Failed
+
+          There was an error creating your tutorial. Please check the workflow logs or contact a repository maintainer.
+
+          [View workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          EOF
+          )"

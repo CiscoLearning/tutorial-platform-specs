@@ -1,0 +1,178 @@
+name: "Create New Tutorial"
+description: "Request creation of a new tutorial folder with all required files"
+title: "[New Tutorial] "
+labels: ["new-tutorial"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Create a New Tutorial
+
+        Fill out this form and a tutorial folder will be automatically created for you with all required files.
+        You'll receive a Pull Request where you can edit the markdown content directly in GitHub.
+
+        **No coding or local setup required!**
+
+  - type: input
+    id: title
+    attributes:
+      label: Tutorial Title
+      description: "The title that will appear on Cisco U. (e.g., 'Getting Started with Ansible Automation')"
+      placeholder: "Getting Started with..."
+    validations:
+      required: true
+
+  - type: input
+    id: slug
+    attributes:
+      label: Tutorial Slug (optional)
+      description: "URL-friendly name (lowercase, hyphens only). Leave blank to auto-generate from title."
+      placeholder: "getting-started-with-ansible"
+    validations:
+      required: false
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: "A brief description of what learners will accomplish (1-2 sentences)"
+      placeholder: "In this tutorial, you will learn how to..."
+    validations:
+      required: true
+
+  - type: input
+    id: author_name
+    attributes:
+      label: Author Name
+      description: "Your full name as it should appear on the tutorial"
+      placeholder: "Jane Doe"
+    validations:
+      required: true
+
+  - type: input
+    id: author_email
+    attributes:
+      label: Author Email
+      description: "Your Cisco email address"
+      placeholder: "jadoe@cisco.com"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: duration
+    attributes:
+      label: Estimated Duration
+      description: "How long will this tutorial take to complete? (Max 1 hour)"
+      options:
+        - "15 minutes"
+        - "20 minutes"
+        - "25 minutes"
+        - "30 minutes"
+        - "35 minutes"
+        - "40 minutes"
+        - "45 minutes"
+        - "50 minutes"
+        - "55 minutes"
+        - "60 minutes"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: skill_level
+    attributes:
+      label: Skill Level
+      description: "Target audience skill level"
+      options:
+        - Beginner
+        - Intermediate
+        - Advanced
+        - Expert
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: technologies
+    attributes:
+      label: Technologies
+      description: "Select all that apply"
+      options:
+        - label: Networking
+        - label: Security
+        - label: Cloud and Computing
+        - label: Data Center
+        - label: Collaboration
+        - label: Application Performance
+        - label: Mobility and Wireless
+        - label: Software
+        - label: Other
+
+  - type: checkboxes
+    id: certifications
+    attributes:
+      label: Related Certifications (optional)
+      description: "Select any related certifications"
+      options:
+        - label: CCNA
+        - label: CCNP Enterprise
+        - label: CCNP Security
+        - label: CCNP Data Center
+        - label: CCNP Collaboration
+        - label: CCNP Service Provider
+        - label: CCIE Enterprise Infrastructure
+        - label: CCIE Security
+        - label: CCIE Data Center
+        - label: CCIE Collaboration
+        - label: CCIE Service Provider
+        - label: Cisco Certified DevNet Associate
+        - label: Cisco Certified DevNet Professional
+        - label: Cisco Certified DevNet Expert
+        - label: Cisco Certified Cybersecurity Associate
+        - label: Cisco Certified Cybersecurity Professional
+
+  - type: input
+    id: tags
+    attributes:
+      label: Tags
+      description: "Comma-separated tags for discoverability (e.g., python, automation, netconf)"
+      placeholder: "python, automation, api"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: num_steps
+    attributes:
+      label: Number of Steps
+      description: "How many content steps? (Overview and Congratulations are added automatically)"
+      options:
+        - "3 (Overview + 3 steps + Congratulations = 5 total)"
+        - "4 (Overview + 4 steps + Congratulations = 6 total)"
+        - "5 (Overview + 5 steps + Congratulations = 7 total)"
+        - "6 (Overview + 6 steps + Congratulations = 8 total)"
+        - "7 (Overview + 7 steps + Congratulations = 9 total)"
+        - "8 (Overview + 8 steps + Congratulations = 10 total)"
+        - "9 (Overview + 9 steps + Congratulations = 11 total)"
+        - "10 (Overview + 10 steps + Congratulations = 12 total)"
+      default: 0
+    validations:
+      required: true
+
+  - type: textarea
+    id: step_titles
+    attributes:
+      label: Step Titles (optional)
+      description: "List the titles for each content step (one per line). Leave blank for generic titles."
+      placeholder: |
+        Set Up Your Environment
+        Configure the Network Device
+        Test Your Configuration
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: acknowledgment
+    attributes:
+      label: Acknowledgment
+      description: "Please confirm"
+      options:
+        - label: I understand that a PR will be created and I will edit the markdown content there
+          required: true
