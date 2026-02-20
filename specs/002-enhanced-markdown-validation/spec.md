@@ -76,6 +76,8 @@ Validation clearly distinguishes between issues that will definitely fail vs tho
 | FR-003 | Detect line breaks inside link/image syntax `[text](url)` | P1 |
 | FR-004 | Detect links/images missing required whitespace around them | P1 |
 | FR-005 | Detect code blocks inside lists with incorrect indentation | P1 |
+| FR-005a | Detect discontinuous numbered lists (e.g., 1, 4 instead of 1, 2, 3, 4) | P1 |
+| FR-005b | Detect local file links in list items (breaks XML ItemPara/ParaBlock) | P1 |
 | FR-006 | Map validation errors to source markdown line numbers | P1 |
 | FR-007 | Provide actionable fix suggestions for each error type | P1 |
 | FR-008 | Auto-fix trailing whitespace (default on, opt-out via `--no-fix`) | P2 |
@@ -271,6 +273,43 @@ For AI-powered fixes (nested lists, code blocks in lists), the detection functio
 
 **Lesson**: When detecting patterns, consider related syntax that shares similar structure.
 
+### 7. Discontinuous Numbered Lists Break XML Conversion
+
+**Problem**: PRs #325 and #326 failed XML conversion with `ItemPara`/`ParaBlock` tag mismatch errors despite passing existing validation.
+
+**Root Cause (PR #326)**: Markdown contained numbered list items that skipped numbers:
+```markdown
+1. First step...
+
+![image](./images/foo.png)
+
+The explanation text...
+
+4. Fourth step (should be 2!)
+```
+
+The markdown-to-XML converter couldn't determine list structure when numbers were discontinuous, producing mismatched tags.
+
+**Fix**: Added `NUMBERED_LIST_DISCONTINUOUS` detection rule with auto-fix that renumbers lists sequentially.
+
+**Lesson**: Discontinuous numbering is valid markdown (renders fine) but breaks XML converters expecting sequential lists.
+
+### 8. Local Links in List Items Need Pattern Fix
+
+**Problem**: `LOCAL_LINK_IN_LIST` rule wasn't detecting links at the START of list items (PR #325).
+
+**Root Cause**: Pattern used `(.+?)` requiring at least one character before the link:
+```markdown
+- [VLAN-Topology](./assets/file.yaml) description  <- NOT detected!
+- Text before [link](./assets/file.yaml) after    <- Was detected
+```
+
+**Fix**: Changed pattern from `(.+?)` to `(.*?)` to allow zero characters before link. Updated fix function to handle links that come first.
+
+**Impact**: Now catches all local file links in list items regardless of position.
+
+**Lesson**: Regex patterns with `+` (one or more) may miss edge cases - consider `*` (zero or more) when the preceding content is optional.
+
 ### 6. Graceful Degradation for Optional Dependencies
 
 The XML conversion test requires `LEARNING_TOKEN` with access to LearningAtCisco private repos. Not all contributors have this access.
@@ -284,8 +323,8 @@ The XML conversion test requires `LEARNING_TOKEN` with access to LearningAtCisco
 ### Deliverables
 
 1. **Enhanced `clean_markdown.py`** (tutorial-testing/tools/)
-   - All 7 detection rules implemented: HTML_TAG, LINK_NO_SPACE_BEFORE, LINK_NO_SPACE_AFTER, LINK_BROKEN, LIST_INDENT, CODE_BLOCK_IN_LIST, TRAILING_WHITESPACE
-   - Auto-fix with regex for simple patterns (HTML tags, spacing, whitespace)
+   - All detection rules implemented: HTML_TAG, LINK_NO_SPACE_BEFORE, LINK_NO_SPACE_AFTER, LINK_BROKEN, LIST_INDENT, CODE_BLOCK_IN_LIST, TRAILING_WHITESPACE, BLANK_LINE_IN_LIST, BOLD_LIST_ITEM, LOCAL_LINK_IN_LIST, NUMBERED_LIST_DISCONTINUOUS
+   - Auto-fix with regex for simple patterns (HTML tags, spacing, whitespace, discontinuous numbering, local links extraction)
    - AI-powered reformatting via Cisco Chat-AI for complex issues (nested lists, code blocks in lists)
    - Severity system (BLOCKING vs WARNING)
    - CLI with --no-fix, --json-output, --verbose flags

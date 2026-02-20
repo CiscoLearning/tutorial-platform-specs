@@ -115,6 +115,10 @@ The `clean_markdown.py` tool detects and auto-fixes markdown patterns that break
 - `LINK_BROKEN`: Line breaks inside link syntax (auto-fixed)
 - `LIST_INDENT_INCONSISTENT`: Inconsistent nested list indentation (AI-powered fix)
 - `CODE_BLOCK_IN_LIST`: Code blocks not indented within lists (AI-powered fix)
+- `BLANK_LINE_IN_LIST`: Blank lines between list items (auto-fixed)
+- `BOLD_LIST_ITEM`: Bold text in list items like `- **Term:**` (auto-fixed)
+- `LOCAL_LINK_IN_LIST`: Local file links in list items like `- [file](./assets/x.yaml)` (auto-fixed: link extracted)
+- `NUMBERED_LIST_DISCONTINUOUS`: Numbered lists that skip numbers (e.g., 1, 4 instead of 1, 2) (auto-fixed: renumbered)
 
 **WARNING issues (pipeline continues):**
 - `TRAILING_WHITESPACE`: Trailing spaces/tabs (auto-fixed)
