@@ -50,12 +50,7 @@ See [.specify/specs/requirements.md](.specify/specs/requirements.md) for the ful
 | FF-5: Hugo Tutorial Migration | 108 tutorials migrated, 92% auto-fix rate | [spec](specs/003-hugo-tutorial-migration/spec.md) |
 | FR-4: Pre-commit Validation | GUID auto-generation on PR, local validation CLI, 29 unit tests | [spec](specs/005-pre-commit-validation/spec.md) |
 | FF-2: Tutorial Creation Workflows | Issue form + auto-PR, Codespace, CLI wizard, 40 unit tests | [spec](specs/006-tutorial-creation-workflows/spec.md) |
-
-### In Progress
-
-| Feature | Description | Spec |
-|---------|-------------|------|
-| FR-5: PR Comment Enhancements | Surface CI errors directly in PR comments | [spec](specs/004-pr-comment-enhancements/spec.md) |
+| FR-5: PR Comment Enhancements | CI errors surfaced in PR comments with fix guidance | [spec](specs/004-pr-comment-enhancements/spec.md) |
 
 ### Backlog
 

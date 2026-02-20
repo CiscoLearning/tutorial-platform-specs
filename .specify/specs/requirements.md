@@ -142,12 +142,16 @@ Automated GUID handling in CI pipeline plus local validation for power users:
 - Local validation CLI (`validate_tutorial.py`) for power users
 - 29 unit tests covering all GUID scenarios
 
-### FR-5: PR Comment Enhancements
-Improve automated PR comments to include:
-- Categorized issues (blocking vs. suggestions)
-- Specific line references for fixes
-- Style guide references for violations
-- Before/after examples for corrections
+### FR-5: PR Comment Enhancements ✅ COMPLETE
+
+**Status:** Completed 2026-02-20 | [Spec](../../specs/004-pr-comment-enhancements/spec.md) | [PR](https://github.com/CiscoLearning/ciscou-tutorial-content/pull/343)
+
+Improved automated PR comments to surface CI errors directly:
+- Broken link errors with file/line/URL details
+- XML conversion errors with plain-language fix guidance
+- Schema validation errors with specific field issues
+- Categorized as blocking vs. warnings
+- Before/after examples for common fixes
 
 ## Non-Functional Requirements
 
