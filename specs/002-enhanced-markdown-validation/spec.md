@@ -310,6 +310,28 @@ The markdown-to-XML converter couldn't determine list structure when numbers wer
 
 **Lesson**: Regex patterns with `+` (one or more) may miss edge cases - consider `*` (zero or more) when the preceding content is optional.
 
+### 9. Solomon XML Cannot Handle Any Code Blocks in List Items
+
+**Problem**: PR #336 passed all validation but Solomon still produced `WARN - unknown element: Code[1]` warnings.
+
+**Root Cause**: The `CODE_BLOCK_IN_LIST` detection only flagged code blocks that were *improperly* indented. But Solomon cannot handle `<Code>` elements inside list items *at all*, even when the markdown is technically correct:
+
+```markdown
+2. Run this command:
+
+    ```
+    show version
+    ```
+```
+
+The 4-space indentation makes this a valid markdown list continuation, but Solomon can't render it.
+
+**Fix**:
+1. Rewrote detection to flag ANY code block that's indented inside a list context
+2. Added `fix_code_block_in_list()` that removes indentation from code blocks, extracting them from list items
+
+**Lesson**: "Valid markdown" doesn't mean "Solomon-compatible." The XML converter has limitations beyond what standard markdown parsers handle.
+
 ### 6. Graceful Degradation for Optional Dependencies
 
 The XML conversion test requires `LEARNING_TOKEN` with access to LearningAtCisco private repos. Not all contributors have this access.
