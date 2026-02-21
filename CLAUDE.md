@@ -202,6 +202,8 @@ For AI analysis and Jira integration:
 - N/A (file-based validation) (002-enhanced-markdown-validation)
 - Python 3.10 (matches existing tools in tutorial-testing) + pytest, requests, jsonschema (already in use) (004-pr-comment-enhancements)
 - N/A (file-based JSON output for inter-step communication) (004-pr-comment-enhancements)
+- Python 3.10 (matches existing CI pipeline) + jsonschema, pytest, requests (existing); regex for pattern matching (007-ai-editorial-agent)
+- N/A - file-based validation; reads `acronym-database.json` and `cisco-product-naming-guide.md` at runtime (007-ai-editorial-agent)
 
 ## Recent Changes
 - 002-enhanced-markdown-validation: Added Python 3.10 (per CI workflow) + jsonschema, pytest, requests (existing); Cisco Chat-AI API (existing ai_analysis.py)

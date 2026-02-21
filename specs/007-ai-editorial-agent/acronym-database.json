@@ -1,0 +1,290 @@
+{
+  "_metadata": {
+    "description": "Acronym database for AI editorial agent",
+    "last_updated": "2026-02-20",
+    "version": "1.0.0"
+  },
+  "cisco_products": {
+    "ASA": {
+      "expansion": "Adaptive Security Appliance",
+      "full_name": "Cisco Secure Firewall Adaptive Security Appliance",
+      "first_use": "Cisco Secure Firewall Adaptive Security Appliance (ASA)",
+      "subsequent": ["Secure Firewall ASA", "ASA"],
+      "deprecated": false,
+      "notes": "Part of Cisco Secure Firewall family"
+    },
+    "FTD": {
+      "expansion": "Firewall Threat Defense",
+      "full_name": "Cisco Secure Firewall Threat Defense",
+      "first_use": "Cisco Secure Firewall Threat Defense",
+      "subsequent": ["Secure Firewall Threat Defense"],
+      "deprecated": true,
+      "notes": "DEPRECATED acronym - use full name"
+    },
+    "FMC": {
+      "expansion": "Firewall Management Center",
+      "full_name": "Cisco Secure Firewall Management Center",
+      "first_use": "Cisco Secure Firewall Management Center",
+      "subsequent": ["Secure Firewall Management Center", "the management center"],
+      "deprecated": true,
+      "notes": "DEPRECATED acronym - use full name"
+    },
+    "ISE": {
+      "expansion": "Identity Services Engine",
+      "full_name": "Cisco Identity Services Engine",
+      "first_use": "Cisco Identity Services Engine (ISE)",
+      "subsequent": ["ISE"],
+      "deprecated": false
+    },
+    "NSO": {
+      "expansion": "Network Services Orchestrator",
+      "full_name": "Cisco Network Services Orchestrator",
+      "first_use": "Cisco Network Services Orchestrator (NSO)",
+      "subsequent": ["NSO"],
+      "deprecated": false
+    },
+    "ACI": {
+      "expansion": "Application Centric Infrastructure",
+      "full_name": "Cisco Application Centric Infrastructure",
+      "first_use": "Cisco Application Centric Infrastructure (Cisco ACI)",
+      "subsequent": ["Cisco ACI"],
+      "deprecated": false,
+      "notes": "Keep 'Cisco' prefix in subsequent uses"
+    },
+    "NX-OS": {
+      "expansion": "Nexus Operating System",
+      "full_name": "Cisco Nexus Operating System",
+      "first_use": "Cisco Nexus Operating System (Cisco NX-OS)",
+      "subsequent": ["Cisco NX-OS"],
+      "deprecated": false,
+      "notes": "Keep 'Cisco' prefix in subsequent uses"
+    },
+    "UCS": {
+      "expansion": "Unified Computing System",
+      "full_name": "Cisco Unified Computing System",
+      "first_use": "Cisco Unified Computing System",
+      "subsequent": ["Unified Computing System"],
+      "deprecated": true,
+      "notes": "DEPRECATED in general text - spell out. OK in GUI element references"
+    },
+    "CCO": {
+      "expansion": "Cisco Connection Online",
+      "full_name": "Cisco Connection Online",
+      "first_use": "Cisco Connection Online",
+      "subsequent": ["Cisco Connection Online"],
+      "deprecated": true,
+      "notes": "Never use CCO acronym - always spell out"
+    }
+  },
+  "trademarks": {
+    "Cisco Umbrella": {
+      "keep_cisco": true,
+      "notes": "Registered trademark - must keep 'Cisco' in most references"
+    },
+    "Cisco Meraki": {
+      "keep_cisco": false,
+      "notes": "Both 'Cisco Meraki' and 'Meraki' are registered trademarks - can use either"
+    },
+    "Cisco AI Assistant": {
+      "keep_cisco": true,
+      "plural_form": "AI Assistant models",
+      "notes": "Never pluralize as 'AI Assistants'"
+    },
+    "Cisco Duo": {
+      "keep_cisco": false,
+      "notes": "Can use 'Duo' after first use"
+    }
+  },
+  "networking": {
+    "VLAN": {
+      "expansion": "virtual LAN",
+      "well_known": true,
+      "expand_first_use": true
+    },
+    "VRF": {
+      "expansion": "virtual routing and forwarding",
+      "well_known": false,
+      "expand_first_use": true
+    },
+    "BGP": {
+      "expansion": "Border Gateway Protocol",
+      "well_known": true,
+      "expand_first_use": true
+    },
+    "OSPF": {
+      "expansion": "Open Shortest Path First",
+      "well_known": true,
+      "expand_first_use": true
+    },
+    "MPLS": {
+      "expansion": "Multiprotocol Label Switching",
+      "well_known": true,
+      "expand_first_use": true
+    },
+    "QoS": {
+      "expansion": "quality of service",
+      "well_known": true,
+      "expand_first_use": true,
+      "notes": "Lowercase expansion"
+    },
+    "SNMP": {
+      "expansion": "Simple Network Management Protocol",
+      "well_known": true,
+      "expand_first_use": true
+    },
+    "DNS": {
+      "expansion": "Domain Name System",
+      "well_known": true,
+      "expand_first_use": true
+    },
+    "DHCP": {
+      "expansion": "Dynamic Host Configuration Protocol",
+      "well_known": true,
+      "expand_first_use": true
+    },
+    "NAT": {
+      "expansion": "Network Address Translation",
+      "well_known": true,
+      "expand_first_use": true
+    },
+    "ACL": {
+      "expansion": "access control list",
+      "well_known": true,
+      "expand_first_use": true,
+      "notes": "Lowercase expansion"
+    },
+    "STP": {
+      "expansion": "Spanning Tree Protocol",
+      "well_known": true,
+      "expand_first_use": true
+    },
+    "LACP": {
+      "expansion": "Link Aggregation Control Protocol",
+      "well_known": false,
+      "expand_first_use": true
+    },
+    "L3VPN": {
+      "expansion": "Layer 3 VPN",
+      "well_known": false,
+      "expand_first_use": true
+    },
+    "ECMP": {
+      "expansion": "Equal Cost Multi-Path",
+      "well_known": false,
+      "expand_first_use": true
+    },
+    "NAS": {
+      "expansion": "Network Access Server",
+      "alternate_expansions": ["network-attached storage"],
+      "well_known": false,
+      "expand_first_use": true,
+      "notes": "Context-dependent - verify correct expansion"
+    },
+    "EPG": {
+      "expansion": "endpoint group",
+      "well_known": false,
+      "expand_first_use": true,
+      "notes": "Lowercase expansion, ACI-specific"
+    }
+  },
+  "security": {
+    "AAA": {
+      "expansion": "authentication, authorization, and accounting",
+      "well_known": true,
+      "expand_first_use": true,
+      "notes": "Lowercase expansion"
+    },
+    "TACACS+": {
+      "expansion": "Terminal Access Controller Access-Control System Plus",
+      "well_known": false,
+      "expand_first_use": true
+    },
+    "RADIUS": {
+      "expansion": "Remote Authentication Dial-In User Service",
+      "well_known": true,
+      "expand_first_use": true
+    },
+    "MFA": {
+      "expansion": "multifactor authentication",
+      "well_known": true,
+      "expand_first_use": true,
+      "notes": "Lowercase expansion"
+    },
+    "SSO": {
+      "expansion": "single sign-on",
+      "well_known": true,
+      "expand_first_use": true,
+      "notes": "Lowercase expansion"
+    },
+    "SAML": {
+      "expansion": "Security Assertion Markup Language",
+      "well_known": false,
+      "expand_first_use": true
+    },
+    "PKI": {
+      "expansion": "public key infrastructure",
+      "well_known": true,
+      "expand_first_use": true,
+      "notes": "Lowercase expansion"
+    },
+    "TLS": {
+      "expansion": "Transport Layer Security",
+      "well_known": true,
+      "expand_first_use": true
+    },
+    "SSL": {
+      "expansion": "Secure Sockets Layer",
+      "well_known": true,
+      "expand_first_use": true
+    },
+    "AVP": {
+      "expansion": "attribute-value pair",
+      "alternate_forms": ["AV pair"],
+      "well_known": false,
+      "expand_first_use": true,
+      "notes": "Do not use AVP acronym alone per Cisco style"
+    }
+  },
+  "general_tech": {
+    "API": {"expansion": "Application Programming Interface", "skip_expansion": true},
+    "URL": {"expansion": "Uniform Resource Locator", "skip_expansion": true},
+    "HTTP": {"expansion": "Hypertext Transfer Protocol", "skip_expansion": true},
+    "HTTPS": {"expansion": "HTTP Secure", "skip_expansion": true},
+    "HTML": {"expansion": "Hypertext Markup Language", "skip_expansion": true},
+    "CSS": {"expansion": "Cascading Style Sheets", "skip_expansion": true},
+    "JSON": {"expansion": "JavaScript Object Notation", "skip_expansion": true},
+    "XML": {"expansion": "Extensible Markup Language", "skip_expansion": true},
+    "SQL": {"expansion": "Structured Query Language", "skip_expansion": true},
+    "CLI": {"expansion": "command-line interface", "skip_expansion": true},
+    "GUI": {"expansion": "graphical user interface", "skip_expansion": true},
+    "OS": {"expansion": "operating system", "skip_expansion": true},
+    "VM": {"expansion": "virtual machine", "skip_expansion": true},
+    "IP": {"expansion": "Internet Protocol", "skip_expansion": true},
+    "TCP": {"expansion": "Transmission Control Protocol", "skip_expansion": true},
+    "UDP": {"expansion": "User Datagram Protocol", "skip_expansion": true},
+    "SSH": {"expansion": "Secure Shell", "skip_expansion": false, "expand_first_use": true},
+    "SMS": {"expansion": "short message service", "skip_expansion": false, "expand_first_use": true, "notes": "Verify correct in context"}
+  },
+  "certifications": {
+    "_notes": "Cisco certifications do NOT need expansion",
+    "CCIE": {"expand": false, "full_name": "Cisco Certified Internetwork Expert"},
+    "CCNP": {"expand": false, "full_name": "Cisco Certified Network Professional"},
+    "CCNA": {"expand": false, "full_name": "Cisco Certified Network Associate"},
+    "CCDA": {"expand": false, "full_name": "Cisco Certified Design Associate"},
+    "DevNet Associate": {"expand": false},
+    "DevNet Professional": {"expand": false},
+    "DevNet Expert": {"expand": false}
+  },
+  "third_party": {
+    "Azure AD": {
+      "status": "deprecated",
+      "replacement": "Microsoft Entra ID",
+      "notes": "Microsoft rebranded in 2023"
+    },
+    "YANG": {
+      "expansion": "Yet Another Next Generation",
+      "expand_first_use": false,
+      "notes": "Typically not expanded - query if unsure"
+    }
+  }
+}

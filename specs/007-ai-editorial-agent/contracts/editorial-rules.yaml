@@ -1,0 +1,288 @@
+# Editorial Rules Contract
+# AI Editorial Agent - Rule Definitions
+# Version: 1.0.0
+# Date: 2026-02-20
+
+metadata:
+  version: "1.0.0"
+  description: "Editorial validation rules for Cisco U. tutorials"
+  sources:
+    - "editor-comments-reference.md"
+    - "masperli (Matt) PR comments"
+    - "jlauterb-edit (Jill) PR comments"
+
+# Severity weights for quality score calculation
+severity_weights:
+  HIGH: 1.0
+  MEDIUM: 0.5
+  LOW: 0.1
+
+# Rule definitions
+rules:
+  # =============================================================================
+  # ACRONYM RULES
+  # =============================================================================
+
+  - id: ACRONYM-001
+    category: ACRONYM
+    severity: HIGH
+    pattern: null  # Stateful check
+    check_type: stateful
+    message_template: "Acronym '{acronym}' on line {line} not expanded on first use"
+    fix_suggestion: "First use should be '{expansion} ({acronym})'"
+    fix_type: AI
+    source: both
+    description: "Acronyms must be expanded on first use in the tutorial"
+
+  - id: ACRONYM-002
+    category: ACRONYM
+    severity: MEDIUM
+    pattern: null  # Stateful check
+    check_type: stateful
+    message_template: "Acronym '{acronym}' expanded again after first use"
+    fix_suggestion: "Use just '{acronym}' for subsequent references"
+    fix_type: AI
+    source: both
+    description: "After first expansion, use acronym only"
+
+  - id: ACRONYM-003
+    category: ACRONYM
+    severity: HIGH
+    pattern: null  # Uses acronym database lookup
+    check_type: database
+    database_key: cisco_products
+    condition: deprecated
+    message_template: "Deprecated acronym '{acronym}' should not be used"
+    fix_suggestion: "Use full name: '{full_name}'"
+    fix_type: MANUAL
+    source: Matt
+    description: "FTD, FMC, UCS, CCO are deprecated acronyms"
+
+  # =============================================================================
+  # PRODUCT NAMING RULES
+  # =============================================================================
+
+  - id: PRODUCT-001
+    category: PRODUCT
+    severity: HIGH
+    pattern: "Cisco\\s+\\w+'s"
+    message_template: "Cisco possessive form not allowed"
+    fix_suggestion: "Use 'the Cisco {product}' instead of 'Cisco {product}'s'"
+    fix_type: AUTO
+    source: Matt
+    description: "Cisco style prohibits possessive form with Cisco products"
+
+  - id: PRODUCT-002
+    category: PRODUCT
+    severity: MEDIUM
+    pattern: null  # Checks against product guide
+    check_type: database
+    database_key: trademarks
+    condition: keep_cisco
+    message_template: "Product '{product}' requires 'Cisco' prefix"
+    fix_suggestion: "Use 'Cisco {product}' for registered trademarks"
+    fix_type: AI
+    source: Matt
+    description: "Certain trademarks must keep Cisco prefix"
+
+  # =============================================================================
+  # HEADING RULES
+  # =============================================================================
+
+  - id: HEADING-001
+    category: HEADING
+    severity: MEDIUM
+    pattern: "^##+ \\w+ing\\b"
+    message_template: "Heading uses gerund form (-ing)"
+    fix_suggestion: "Use imperative form: '{imperative}' instead of '{gerund}'"
+    fix_type: AI
+    source: Jill
+    description: "Headings should use imperative mood, not gerund"
+    examples:
+      - before: "## Configuring the Network"
+        after: "## Configure the Network"
+      - before: "## Troubleshooting Issues"
+        after: "## Troubleshoot Issues"
+
+  - id: HEADING-002
+    category: HEADING
+    severity: HIGH
+    pattern: null  # Checks title vs sidecar.json
+    check_type: sidecar
+    message_template: "Title contains both acronym and expansion"
+    fix_suggestion: "Use either '{acronym}' OR '{expansion}', not both"
+    fix_type: MANUAL
+    source: Matt
+    description: "Cisco rule since 2008: title must have acronym OR expansion, not both"
+
+  # =============================================================================
+  # BOLD/FORMATTING RULES
+  # =============================================================================
+
+  - id: BOLD-001
+    category: BOLD
+    severity: HIGH
+    pattern: null  # Context-dependent analysis
+    check_type: ai
+    message_template: "Bold used for emphasis, not GUI element"
+    fix_suggestion: "Use *italics* for emphasis; bold is for GUI elements only"
+    fix_type: AI
+    source: Jill
+    description: "Bold reserved for GUI elements with direct instructions"
+
+  - id: BOLD-002
+    category: BOLD
+    severity: MEDIUM
+    pattern: "\\b[Cc]lick\\s+on\\b"
+    message_template: "Use 'click' not 'click on'"
+    fix_suggestion: "Change 'click on' to 'click'"
+    fix_type: AUTO
+    source: Matt
+    description: "Standard technical writing style"
+    examples:
+      - before: "Click on the **Save** button"
+        after: "Click the **Save** button"
+
+  # =============================================================================
+  # PUNCTUATION RULES
+  # =============================================================================
+
+  - id: PUNCT-001
+    category: PUNCT
+    severity: MEDIUM
+    pattern: "\\s+—\\s+"
+    message_template: "Em dash should not have spaces"
+    fix_suggestion: "Remove spaces around em dash"
+    fix_type: AUTO
+    source: Jill
+    description: "Em dashes should connect directly to adjacent text"
+    examples:
+      - before: "problems — they assume"
+        after: "problems—they assume"
+
+  - id: PUNCT-002
+    category: PUNCT
+    severity: LOW
+    pattern: "!{2,}"
+    message_template: "Multiple exclamation marks"
+    fix_suggestion: "Use single exclamation or period"
+    fix_type: AUTO
+    source: Jill
+    description: "Avoid excessive exclamation marks"
+
+  - id: PUNCT-003
+    category: PUNCT
+    severity: LOW
+    pattern: null  # Content analysis
+    check_type: ai
+    message_template: "Excessive use of exclamation marks in content"
+    fix_suggestion: "Limit exclamation marks; use sparingly for genuine emphasis"
+    fix_type: AI
+    source: Jill
+    description: "Count and flag high density of exclamation marks"
+
+  # =============================================================================
+  # PROCEDURAL STRUCTURE RULES
+  # =============================================================================
+
+  - id: PROC-001
+    category: PROC
+    severity: MEDIUM
+    pattern: null  # Structural check
+    check_type: structural
+    message_template: "Numbered list missing procedural introduction"
+    fix_suggestion: "Add 'To {action}:' before the numbered steps"
+    fix_type: AI
+    source: Jill
+    description: "Numbered steps should have intro like 'To configure the service:'"
+    examples:
+      - before: |
+          ## Configure the Service
+
+          1. Click **Settings**.
+        after: |
+          ## Configure the Service
+
+          To configure the service:
+
+          1. Click **Settings**.
+
+  # =============================================================================
+  # CROSS-REFERENCE RULES
+  # =============================================================================
+
+  - id: XREF-001
+    category: XREF
+    severity: LOW
+    pattern: "\\([Ss]ee the next step.*?\\)"
+    message_template: "Vague forward reference"
+    fix_suggestion: "Consider removing if reference is several steps away"
+    fix_type: MANUAL
+    source: Jill
+    description: "Remove vague references to content that's not immediately next"
+
+  # =============================================================================
+  # DURATION RULES
+  # =============================================================================
+
+  - id: DUR-001
+    category: PROC
+    severity: HIGH
+    pattern: null  # JSON calculation
+    check_type: sidecar
+    message_template: "Duration mismatch: steps total {step_total} but sidecar says {sidecar_total}"
+    fix_suggestion: "Update sidecar.json duration or individual step times"
+    fix_type: MANUAL
+    source: Jill
+    description: "Step durations must sum to total tutorial duration"
+
+  # =============================================================================
+  # TERMINOLOGY RULES
+  # =============================================================================
+
+  - id: TERM-001
+    category: TERM
+    severity: LOW
+    pattern: "\\bISE\\s+box\\b"
+    message_template: "Use 'server' not 'box'"
+    fix_suggestion: "Change 'ISE box' to 'ISE server'"
+    fix_type: AUTO
+    source: Jill
+    description: "Professional terminology"
+
+  - id: TERM-002
+    category: TERM
+    severity: LOW
+    pattern: "\\bclient/server\\b"
+    message_template: "Use hyphenated form"
+    fix_suggestion: "Change 'client/server' to 'client-server'"
+    fix_type: AUTO
+    source: Jill
+    description: "Consistent hyphenation"
+
+# Categories metadata for PR comment organization
+categories:
+  ACRONYM:
+    display_name: "Acronym Usage"
+    priority: 1
+  PRODUCT:
+    display_name: "Product Naming"
+    priority: 2
+  HEADING:
+    display_name: "Heading Style"
+    priority: 3
+  BOLD:
+    display_name: "Formatting"
+    priority: 4
+  PUNCT:
+    display_name: "Punctuation"
+    priority: 5
+  PROC:
+    display_name: "Structure"
+    priority: 6
+  XREF:
+    display_name: "Cross-References"
+    priority: 7
+  TERM:
+    display_name: "Terminology"
+    priority: 8

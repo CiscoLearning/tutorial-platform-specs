@@ -9,13 +9,14 @@ tutorial-platform-specs/
 ├── .specify/                    # Spec-Kit templates and project memory
 │   ├── memory/constitution.md   # Project principles and governance
 │   └── specs/                   # Requirements, architecture docs
-├── specs/                       # Feature specifications
+├── specs/                       # Feature specifications (see specs/README.md)
 │   ├── 001-tutorial-testing-sync/     # Completed: Production sync
 │   ├── 002-enhanced-markdown-validation/  # Completed: 7 detection rules
 │   ├── 003-hugo-tutorial-migration/   # Completed: 108 tutorials migrated
-│   ├── 004-pr-comment-enhancements/   # In Progress: Better CI error surfacing
+│   ├── 004-pr-comment-enhancements/   # Completed: Better CI error surfacing
 │   ├── 005-pre-commit-validation/     # Completed: GUID auto-generation
-│   └── 006-tutorial-creation-workflows/  # Completed: Issue form + Codespace
+│   ├── 006-tutorial-creation-workflows/  # Completed: Issue form + Codespace
+│   └── 007-ai-editorial-agent/        # In Progress: AI-powered editorial review
 ├── CLAUDE.md                    # Claude Code instructions
 ├── tutorial-testing/            # Cloned repo (tools development)
 └── ciscou-tutorial-content/     # Cloned repo (production reference)
@@ -46,18 +47,22 @@ See [.specify/specs/requirements.md](.specify/specs/requirements.md) for the ful
 | Feature | Description | Spec |
 |---------|-------------|------|
 | FR-0: Tutorial-Testing Sync | Daily sync of production tutorials to testing repo | [spec](specs/001-tutorial-testing-sync/spec.md) |
-| FR-1: Enhanced Markdown Validation | 7 detection rules, 41% false positive reduction | [spec](specs/002-enhanced-markdown-validation/spec.md) |
+| FR-1: Enhanced Markdown Validation | 20+ detection rules, auto-fix for XML compatibility | [spec](specs/002-enhanced-markdown-validation/spec.md) |
 | FF-5: Hugo Tutorial Migration | 108 tutorials migrated, 92% auto-fix rate | [spec](specs/003-hugo-tutorial-migration/spec.md) |
-| FR-4: Pre-commit Validation | GUID auto-generation on PR, local validation CLI, 29 unit tests | [spec](specs/005-pre-commit-validation/spec.md) |
-| FF-2: Tutorial Creation Workflows | Issue form + auto-PR, Codespace, CLI wizard, 40 unit tests | [spec](specs/006-tutorial-creation-workflows/spec.md) |
+| FR-4: Pre-commit Validation | GUID auto-generation on PR, local validation CLI | [spec](specs/005-pre-commit-validation/spec.md) |
+| FF-2: Tutorial Creation Workflows | Issue form + auto-PR, Codespace, CLI wizard | [spec](specs/006-tutorial-creation-workflows/spec.md) |
 | FR-5: PR Comment Enhancements | CI errors surfaced in PR comments with fix guidance | [spec](specs/004-pr-comment-enhancements/spec.md) |
+
+### In Progress
+
+| Feature | Description | Spec |
+|---------|-------------|------|
+| FR-7: AI Editorial Agent | AI-powered editorial review (~75% coverage of human editor changes) | [spec](specs/007-ai-editorial-agent/spec.md) |
 
 ### Backlog
 
 | Feature | Description | Priority |
 |---------|-------------|----------|
-| FR-2 | Editorial Style Validation | High |
-| FR-3 | AI-Powered Editorial Feedback | High |
 | FF-1 | AI-Powered Sidecar Generation | Future |
 | FF-3 | Tutorial Preview Rendering | Future |
 
