@@ -2,8 +2,39 @@
 
 **Feature Branch**: `007-ai-editorial-agent`
 **Created**: 2026-02-20
-**Status**: Draft
-**Input**: AI Editorial Agent to replace human editors (masperli/Matt and jlauterb-edit/Jill) who review tutorial PRs for non-technical editorial issues. The agent will run in CI pipeline and provide the same editorial feedback they currently provide manually.
+**Updated**: 2026-02-21
+**Status**: In Progress (~75% rule coverage achieved)
+
+## Current State
+
+### Completed
+
+| Deliverable | Location | Description |
+|-------------|----------|-------------|
+| Official Style Rules | `tutorial-testing/tools/cisco-style-rules.json` | 75+ term substitutions from Cisco Technical Content Style Guide |
+| Acronym Database | `tutorial-testing/.claude/references/acronym-database.json` | 100+ entries with Cisco products, networking, security terms |
+| Editorial Agent Instructions | `tutorial-testing/.claude/agents/editorial-reviewer.md` | Agent instructions with official Cisco rules |
+| Heading Conversion | `tutorial-testing/tools/clean_markdown.py` | `fix_headings_for_xml()` for Solomon XML compatibility |
+| PR Analysis (24 PRs) | `tutorial-testing/analysis/v2-official-rules/` | Comparison of human editor changes vs agent detection |
+
+### Key Metrics
+
+| Metric | Value |
+|--------|-------|
+| PRs Analyzed | 24 |
+| Total Editor Changes | 1,689 |
+| Estimated Agent Coverage | ~75% |
+| Official Rules Extracted | 75+ terms |
+| Acronyms Documented | 100+ entries |
+
+### Remaining Work
+
+1. Implement deterministic rules engine (`editorial_validation.py`)
+2. Integrate with CI pipeline
+3. Generate PR comments in Jill's step-by-step format
+4. Measure actual coverage on live PRs
+
+---
 
 ## Overview
 
@@ -145,7 +176,30 @@ Editorial team members can update the product naming guide and acronym database 
 
 ## Related Documents
 
-- [Editor Comments Reference](./editor-comments-reference.md) - Comprehensive rules extracted from PR history
-- [Cisco Product Naming Guide](./cisco-product-naming-guide.md) - Living reference for product names and trademarks
-- [Acronym Database](./acronym-database.json) - Machine-readable acronym rules and expansions
-- [Editorial Style Guide](../../.specify/specs/editorial-style-guide.md) - Original style guide from editorial team
+### In This Directory
+
+- [Editor Comments Reference](./editor-comments-reference.md) - Rules extracted from 24 PRs of editor feedback
+- [Cisco Product Naming Guide](./cisco-product-naming-guide.md) - Product names and trademarks
+- [Acronym Database](./acronym-database.json) - Initial acronym reference (superseded by live version)
+- [Plan](./plan.md) - Implementation plan
+- [Tasks](./tasks.md) - Task breakdown
+- [Research](./research.md) - Research findings
+
+### In tutorial-testing/
+
+- `tools/cisco-style-rules.json` - Official Cisco Style Guide rules (75+ terms)
+- `.claude/references/acronym-database.json` - Live acronym database (100+ entries)
+- `.claude/agents/editorial-reviewer.md` - Agent instructions
+- `analysis/v2-official-rules/COMPARISON-REPORT.md` - Full v2 analysis report
+
+### Source Documents
+
+- `stylegd.pdf` - Cisco Technical Content Style Guide (August 2022, 182 pages)
+- `Tutorials Guidelines.pdf` - Cisco U. Tutorial Guidelines
+
+### Archived
+
+See `archive/` for intermediate work products:
+- `pr-comparisons/` - Individual PR analyses (v1)
+- `reference-data/` - Raw editor comments
+- `test-tutorial/` - Test fixtures
