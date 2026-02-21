@@ -20,9 +20,13 @@ Date: February 2026
 **Current State: Manual Editorial Review**
 
 - Two part-time editors (Matt & Jill) review every PR
-- 30-60 minutes per tutorial for non-technical edits
+- **1.5 to 6+ hours** per tutorial for non-technical edits
 - Bottleneck: Limited editor availability
 - Inconsistent feedback turnaround
+
+**Actual Editor Time (from commit timestamps):**
+- PR #193 (11 steps): 1h 36m
+- PR #177 (12 steps): 6h 21m (across 2 days)
 
 **Pain Points:**
 - Authors wait days for editorial feedback
@@ -163,14 +167,19 @@ An automated system that:
 
 **Before & After**
 
-| Metric | Before | After |
-|--------|--------|-------|
-| Feedback time | Days | Minutes |
-| Editor time/PR | 30-60 min | Focus on complex issues |
+| Metric | Before (Human) | After (AI Agent) |
+|--------|----------------|------------------|
+| Feedback time | Days (editor availability) | < 5 minutes |
+| Time per tutorial | 1.5-6+ hours | ~2 minutes |
 | Style compliance | Variable | Consistent |
-| Author iteration | Slow | Fast |
+| Coverage | 100% (but slow) | ~75% (instant) |
 
-**Goal:** Free editors to focus on nuanced decisions while AI handles routine checks
+**Time Savings Calculation:**
+- Average human time: ~3 hours/tutorial
+- AI agent time: ~2 minutes
+- **Savings: 98% reduction in routine editorial time**
+
+**Goal:** Free editors to focus on nuanced decisions (25% of issues) while AI handles routine checks (75%)
 
 ---
 

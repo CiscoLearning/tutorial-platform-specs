@@ -58,7 +58,7 @@ The tutorial platform has evolved through 7 major features, transforming from a 
 
 ### Phase 4: AI Editorial (007)
 
-**Problem:** Human editors (Matt and Jill) manually review every PR for non-technical editorial issues, spending 30-60 minutes per tutorial.
+**Problem:** Human editors (Matt and Jill) manually review every PR for non-technical editorial issues, spending **1.5-6+ hours per tutorial** (verified from commit timestamps: PR #193 = 1h36m, PR #177 = 6h21m).
 
 **Solution:**
 - Extracted 1,689 editorial changes from 24 PRs to understand editor patterns
@@ -82,7 +82,7 @@ The tutorial platform has evolved through 7 major features, transforming from a 
 - Markdown issues discovered late in pipeline
 - XML conversion failures blocked releases
 - New tutorial setup took hours
-- Editors spent 30-60 min/PR on routine fixes
+- Editors spent 1.5-6+ hours/PR on routine fixes
 
 ### After This Project
 

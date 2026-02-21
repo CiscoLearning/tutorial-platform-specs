@@ -38,7 +38,7 @@
 
 ## Overview
 
-The AI Editorial Agent automates the non-technical editorial review process for Cisco U. tutorial PRs. Currently, two part-time human editors (Matt Sperling and Jill Lauterbach) manually review every PR for style guide compliance, grammar, acronym usage, and Cisco branding standards. This agent will replicate their editorial patterns to provide immediate, consistent feedback on PRs while reducing the editorial bottleneck.
+The AI Editorial Agent automates the non-technical editorial review process for Cisco U. tutorial PRs. Currently, two part-time human editors (Matt Sperling and Jill Lauterbach) manually review every PR for style guide compliance, grammar, acronym usage, and Cisco branding standards. Based on commit timestamp analysis, editors spend **1.5-6+ hours per tutorial** (PR #193: 1h36m, PR #177: 6h21m). This agent will replicate their editorial patterns to provide immediate, consistent feedback on PRs while reducing the editorial bottleneck.
 
 **Key Constraints:**
 - Advisory only - provides feedback via PR comments but does not block merge
